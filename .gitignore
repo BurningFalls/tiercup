@@ -43,3 +43,6 @@ next-env.d.ts
 
 # session reports
 /session-report*/
+
+# shrimp data
+/shrimp_data*/
