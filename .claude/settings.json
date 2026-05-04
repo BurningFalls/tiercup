@@ -1,5 +1,9 @@
 {
   "enabledPlugins": {
-    "context7-plugin@context7-marketplace": true
+    "context7-plugin@context7-marketplace": true,
+    "session-report@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "serena@claude-plugins-official": true,
+    "hookify@claude-plugins-official": true
   }
 }
