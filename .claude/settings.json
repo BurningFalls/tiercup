@@ -1,17 +1,4 @@
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "jq -r '.tool_input.command' | grep -q '^git commit' && echo '{\"systemMessage\":\"💡 개발 로그 기록하려면 /notion-dev-log 를 입력하세요.\"}' || true"
-          }
-        ]
-      }
-    ]
-  },
   "enabledPlugins": {
     "context7-plugin@context7-marketplace": true,
     "session-report@claude-plugins-official": true,
