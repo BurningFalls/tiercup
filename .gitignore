@@ -46,3 +46,6 @@ next-env.d.ts
 
 # shrimp data
 /shrimp_data*/
+
+# notion dev log
+.claude/skills/notion-dev-log/notion-dev-log-state.json
