@@ -62,4 +62,14 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ---
 
+## 5. Task 실행 브랜치 관리
+
+ROADMAP.md 기반 task 실행 요청이 오면:
+1. `git branch --show-current`로 현재 브랜치 확인
+2. `develop`이 아니면 먼저 `develop`으로 이동
+3. `feature/task-{번호}-{ROADMAP.md 제목 kebab-case 요약}` 브랜치 생성 후 체크아웃
+4. 구현 완료 후 사용자에게 결과 보고
+
+---
+
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
