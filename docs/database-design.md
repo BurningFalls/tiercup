@@ -89,7 +89,7 @@ RDB을 사용하며, snake_case 네이밍 컨벤션을 따른다.
 | id | BIGINT, PK, AUTO_INCREMENT | 고유 ID |
 | tier_cup_id | BIGINT, FK | 티어컵 ID |
 | result_code | VARCHAR(10), UNIQUE | 결과 페이지용 코드 |
-| status | ENUM('playing', 'completed') | 진행 상태 |
+| status | ENUM('in_progress', 'completed') | 진행 상태 |
 | comparison_count | INT, DEFAULT 0 | 비교 횟수 |
 | started_at | DATETIME | 시작 시간 |
 | completed_at | DATETIME, NULL | 완료 시간 |
