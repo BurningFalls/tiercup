@@ -54,7 +54,16 @@ gh pr merge --squash --delete-branch
 
 ## 4단계: base 브랜치로 전환 + 로컬 브랜치 삭제
 
-feature 브랜치명을 저장한 뒤 base 브랜치로 전환하고 로컬 브랜치를 삭제합니다:
+`gh pr merge`가 자동으로 처리하지 않은 경우에만 실행합니다.
+아래 명령어로 현재 브랜치와 로컬 브랜치 존재 여부를 확인합니다:
+
+```bash
+git branch --show-current
+git branch --list <feature-branch>
+```
+
+- 현재 브랜치가 이미 `<baseRefName>`이고 `<feature-branch>`가 존재하지 않으면 → 5단계로 건너뜁니다.
+- 아직 feature 브랜치에 있거나 로컬 브랜치가 남아있으면 실행합니다:
 
 ```bash
 git checkout <baseRefName>
