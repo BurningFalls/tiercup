@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import Navbar from "@/components/layout/navbar";
 
 export const metadata: Metadata = {
   title: "TierCup",
@@ -22,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${geistSans.className} antialiased`}>
+        <Navbar />
         {children}
         <Toaster />
       </body>
