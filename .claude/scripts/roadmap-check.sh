@@ -18,7 +18,7 @@ TASK_ID=$(printf "%03d" "$((10#$TASK_NUM))")
 # 해당 Task 섹션의 미체크 항목(- [ ])을 체크(- [x])로 변경
 # 대상 범위: "### Task {ID}" 시작 ~ 다음 "### Task" 또는 "---" 전까지
 awk -v task="Task $TASK_ID" '
-  /^### / { in_task = ($0 ~ task) }
+  /^### / { in_task = ($0 == "### " task) }
   in_task && /^- \[ \]/ { sub(/^- \[ \]/, "- [x]") }
   { print }
 ' "$ROADMAP" > "$ROADMAP.tmp" && mv "$ROADMAP.tmp" "$ROADMAP"
