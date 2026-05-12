@@ -1,4 +1,17 @@
 {
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.command' | grep -qE 'git commit' && bash \"$CLAUDE_PROJECT_DIR/.claude/scripts/roadmap-check.sh\" || true"
+          }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": {
     "context7-plugin@context7-marketplace": true,
     "session-report@claude-plugins-official": true,
