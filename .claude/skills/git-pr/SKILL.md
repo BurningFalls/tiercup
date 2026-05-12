@@ -100,7 +100,12 @@ gh label list --json name --jq '.[].name'
 | `test` | `bfd4f2` |
 
 ```bash
-gh label create "<태그>" --color "<색상>" --description "<설명>"
+gh label create "feature" --color "0075ca" --description "New feature or request"
+gh label create "fix" --color "d73a4a" --description "Bug fix"
+gh label create "refactor" --color "e4e669" --description "Code refactoring"
+gh label create "chore" --color "cfd3d7" --description "Maintenance or tooling"
+gh label create "docs" --color "0052cc" --description "Documentation changes"
+gh label create "test" --color "bfd4f2" --description "Test additions or fixes"
 ```
 
 ## 6단계: PR 생성
@@ -123,19 +128,18 @@ EOF
 `GITHUB_PROJECT_ID`가 없으면 이 단계를 건너뜁니다.
 
 ```bash
-PROJECT_ID=$(grep GITHUB_PROJECT_ID .env.local 2>/dev/null | cut -d '=' -f2)
+PROJECT_ID=$(grep GITHUB_PROJECT_ID .env.local 2>/dev/null | cut -d '=' -f2-)
 if [ -n "$PROJECT_ID" ]; then
   PR_ID=$(gh pr view --json id --jq '.id')
-  gh api graphql -f query="
-    mutation {
+  gh api graphql \
+    -f query='mutation($projectId: ID!, $contentId: ID!) {
       addProjectV2ItemById(input: {
-        projectId: \"$PROJECT_ID\"
-        contentId: \"$PR_ID\"
-      }) {
-        item { id }
-      }
-    }
-  "
+        projectId: $projectId
+        contentId: $contentId
+      }) { item { id } }
+    }' \
+    -f projectId="$PROJECT_ID" \
+    -f contentId="$PR_ID"
 fi
 ```
 
