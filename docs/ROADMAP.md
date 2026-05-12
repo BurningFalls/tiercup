@@ -50,16 +50,16 @@
 
 ### Task 001 — 개발 환경 설정
 
-- [ ] Next.js 15 + TypeScript + TailwindCSS v4 프로젝트 초기화
-- [ ] shadcn/ui 설치 및 기본 컴포넌트 설정 (Button, Card, Dialog 등)
-- [ ] Lucide React, @dnd-kit/core, React Hook Form, Zod 패키지 설치
-- [ ] ESLint / Prettier 설정
-- [ ] 절대 경로 임포트 설정 (`@/`)
-- [ ] 환경 변수 파일 구성 (`.env.local`, `.env.example`)
+- [x] Next.js 15 + TypeScript + TailwindCSS v4 프로젝트 초기화
+- [x] shadcn/ui 설치 및 기본 컴포넌트 설정 (Button, Card, Dialog 등)
+- [x] Lucide React, @dnd-kit/core, React Hook Form, Zod 패키지 설치
+- [x] ESLint / Prettier 설정
+- [x] 절대 경로 임포트 설정 (`@/`)
+- [x] 환경 변수 파일 구성 (`.env.local`, `.env.example`)
 
 ### Task 002 — 라우트 골격 구축
 
-- [ ] App Router 기반 전체 페이지 라우트 골격 생성
+- [x] App Router 기반 전체 페이지 라우트 골격 생성
   - `/` — 메인 페이지
   - `/explore` — 전체 티어컵 페이지
   - `/create` — 새 티어컵 만들기 페이지
@@ -68,16 +68,16 @@
   - `/result/[resultCode]` — 결과 페이지
   - `/stats/[playCode]` — 통계 페이지
   - `/manage/[manageCode]` — 티어컵 수정 페이지
-- [ ] 공통 레이아웃(`layout.tsx`) 및 내비게이션 컴포넌트 구조 확립
-- [ ] 404 / 에러 페이지 기본 구성
+- [x] 공통 레이아웃(`layout.tsx`) 및 내비게이션 컴포넌트 구조 확립
+- [x] 404 / 에러 페이지 기본 구성
 
 ### Task 003 — 공통 타입 및 Zod 스키마 정의
 
-- [ ] 도메인 타입 정의 (`TierCup`, `Item`, `PlaySession`, `Comparison`, `PlayResult`, `Like`)
-- [ ] 티어 타입 정의 (`Tier: 'S' | 'A' | 'B' | 'C' | 'D' | 'F' | '?'`)
-- [ ] API 요청/응답 타입 정의
-- [ ] Zod 스키마 정의 (제목 30자 제한, 아이템 4~64개 범위, 이미지 5MB 제한 등)
-- [ ] nanoid 기반 코드 생성 유틸 (play_code 6자, manage_code 12자, result_code 6자)
+- [x] 도메인 타입 정의 (`TierCup`, `Item`, `PlaySession`, `Comparison`, `PlayResult`, `Like`)
+- [x] 티어 타입 정의 (`Tier: 'S' | 'A' | 'B' | 'C' | 'D' | 'F' | '?'`)
+- [x] API 요청/응답 타입 정의
+- [x] Zod 스키마 정의 (제목 30자 제한, 아이템 4~64개 범위, 이미지 5MB 제한 등)
+- [x] nanoid 기반 코드 생성 유틸 (play_code 6자, manage_code 12자, result_code 6자)
 
 ### Task 004 — Supabase 데이터베이스 및 Storage 구축
 
