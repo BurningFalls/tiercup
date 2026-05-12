@@ -44,7 +44,24 @@ git log develop..HEAD --oneline
 
 ## 4단계: PR 본문 작성
 
-커밋 목록과 변경 파일을 바탕으로 본문을 작성합니다:
+커밋 목록과 변경 파일을 바탕으로 본문을 작성합니다.
+
+### 이슈 번호 조회
+
+브랜치명에서 Task 번호를 추출해 연결할 이슈 번호를 찾습니다:
+
+```bash
+# 브랜치명 예: feature/task-001-dev-environment-setup → "001" 추출
+TASK_NUM=$(git branch --show-current | grep -oE 'task-[0-9]+' | grep -oE '[0-9]+')
+
+if [ -n "$TASK_NUM" ]; then
+  ISSUE_NUM=$(gh issue list --search "Task $(printf '%03d' $((10#$TASK_NUM)))" --json number,title --jq '.[0].number // empty')
+fi
+```
+
+### 본문 형식
+
+`ISSUE_NUM`이 존재하면 `Closes #번호`를 포함하고, 없으면 해당 줄을 생략합니다:
 
 ```markdown
 ## Summary
@@ -62,6 +79,8 @@ git log develop..HEAD --oneline
 
 - [ ] <검증 항목 1>
 - [ ] <검증 항목 2>
+
+Closes #<이슈번호>
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
