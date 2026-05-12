@@ -15,7 +15,7 @@ export interface Item {
   id: string
   tier_cup_id: string
   name: string
-  image_url: string
+  image_url: string | null
   display_order: number
   created_at: string
 }
@@ -108,7 +108,7 @@ export interface PlayResultsResponse {
 }
 
 export interface StatsResponse {
-  tier_distribution: Record<string, Record<Tier, number>>
+  tier_distribution: Record<string, Record<Tier, number>> // key: item_id
   total_plays: number
   total_comparisons: number
   avg_duration_seconds: number

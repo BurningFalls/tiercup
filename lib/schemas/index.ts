@@ -6,7 +6,7 @@ const MAX_IMAGE_SIZE = 5 * 1024 * 1024
 export const itemSchema = z.object({
   name: z.string().min(1, '아이템 이름을 입력하세요').max(50, '50자 이하로 입력하세요'),
   image: z
-    .instanceof(File)
+    .custom<File>((val) => typeof File !== 'undefined' && val instanceof File)
     .refine((f) => f.size <= MAX_IMAGE_SIZE, '이미지는 5MB 이하여야 합니다')
     .refine(
       (f) => ALLOWED_IMAGE_TYPES.includes(f.type),
@@ -28,8 +28,8 @@ export const tierCupSchema = z.object({
 })
 
 export const comparisonSchema = z.object({
-  winner_item_id: z.string(),
-  loser_item_id: z.string(),
+  winner_item_id: z.string().min(1),
+  loser_item_id: z.string().min(1),
 })
 
 export const updateResultSchema = z.object({
