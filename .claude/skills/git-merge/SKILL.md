@@ -1,7 +1,6 @@
 ---
 name: git-merge
 description: 현재 feature 브랜치의 PR을 squash merge하고, 원격/로컬 브랜치를 삭제한 뒤 base 브랜치를 pull합니다. "머지해줘", "merge 해줘", "PR 머지하고 브랜치 정리해줘", "git-merge" 등의 요청에 사용하세요.
-context: fork
 ---
 
 ## 1단계: 현재 상태 확인
@@ -27,7 +26,12 @@ gh pr view --json number,title,state,mergeable,baseRefName
 - `mergeable`이 `CONFLICTING`이면:
   > "충돌이 있어 머지할 수 없습니다. 충돌을 해결한 후 다시 시도해주세요."
 
-- `mergeable`이 `UNKNOWN`이면 10초 대기 후 재확인합니다. 재확인 후에도 UNKNOWN이면:
+- `mergeable`이 `UNKNOWN`이면 아래 명령어로 10초 대기 후 재확인합니다:
+  ```bash
+  sleep 10
+  gh pr view --json mergeable --jq '.mergeable'
+  ```
+  재확인 후에도 UNKNOWN이면:
   > "머지 가능 여부를 확인할 수 없습니다. 잠시 후 다시 시도해주세요."
 
 ## 2단계: 머지 정보 출력
@@ -45,7 +49,8 @@ PR #<number>: <title>
 gh pr merge --squash --delete-branch
 ```
 
-`--delete-branch` 플래그로 원격 feature 브랜치를 자동 삭제합니다.
+`--delete-branch` 플래그로 **원격(remote)** feature 브랜치를 자동 삭제합니다.
+로컬 브랜치는 4단계에서 별도로 삭제합니다.
 
 ## 4단계: base 브랜치로 전환 + 로컬 브랜치 삭제
 
