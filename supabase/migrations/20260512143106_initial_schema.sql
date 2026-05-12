@@ -19,7 +19,7 @@ CREATE TABLE items (
   id            BIGSERIAL PRIMARY KEY,
   tier_cup_id   BIGINT       NOT NULL REFERENCES tier_cups(id) ON DELETE CASCADE,
   name          VARCHAR(50)  NOT NULL,
-  image_url     VARCHAR(500),
+  image_url     TEXT,
   display_order INT          NOT NULL,
   created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
@@ -120,6 +120,7 @@ CREATE POLICY "tier_cups_update" ON tier_cups FOR UPDATE USING (true);
 CREATE POLICY "tier_cups_delete" ON tier_cups FOR DELETE USING (true);
 
 -- items: 누구나 조회/생성/삭제
+-- items UPDATE 정책 미포함 — 이름/이미지는 삭제 후 재생성 방식 사용
 CREATE POLICY "items_select" ON items FOR SELECT USING (true);
 CREATE POLICY "items_insert" ON items FOR INSERT WITH CHECK (true);
 CREATE POLICY "items_delete" ON items FOR DELETE USING (true);

@@ -17,7 +17,8 @@ CREATE POLICY "item_images_insert"
 
 CREATE POLICY "item_images_update"
   ON storage.objects FOR UPDATE
-  USING (bucket_id = 'item-images');
+  USING (bucket_id = 'item-images')
+  WITH CHECK (bucket_id = 'item-images');
 
 -- 삭제: 누구나 가능 (티어컵 삭제 시 연동)
 CREATE POLICY "item_images_delete"

@@ -149,10 +149,10 @@ tier_cups (1) ──── (N) items
 
 ## 6. 인덱스
 
+UNIQUE 제약 컬럼(`play_code`, `manage_code`, `result_code`)은 PostgreSQL이 자동으로 인덱스를 생성하므로 명시적 인덱스를 추가하지 않습니다.
+
 ```sql
 -- tier_cups
-CREATE INDEX idx_tier_cups_play_code ON tier_cups(play_code);
-CREATE INDEX idx_tier_cups_manage_code ON tier_cups(manage_code);
 CREATE INDEX idx_tier_cups_play_count ON tier_cups(play_count DESC);
 CREATE INDEX idx_tier_cups_like_count ON tier_cups(like_count DESC);
 CREATE INDEX idx_tier_cups_created_at ON tier_cups(created_at DESC);
@@ -162,7 +162,6 @@ CREATE INDEX idx_items_tier_cup_id ON items(tier_cup_id);
 
 -- play_sessions
 CREATE INDEX idx_play_sessions_tier_cup_id ON play_sessions(tier_cup_id);
-CREATE INDEX idx_play_sessions_result_code ON play_sessions(result_code);
 
 -- comparisons
 CREATE INDEX idx_comparisons_play_session_id ON comparisons(play_session_id);
