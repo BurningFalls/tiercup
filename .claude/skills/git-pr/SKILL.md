@@ -69,18 +69,76 @@ git log develop..HEAD --oneline
 Summary는 커밋 메시지들을 종합해 변경의 목적 중심으로 작성합니다 (커밋 메시지를 그대로 나열하지 않음).
 Test plan은 변경 내용에 맞는 실질적인 검증 항목을 작성합니다.
 
-## 5단계: PR 생성
+## 5단계: 메타데이터 준비
+
+### GitHub 사용자명 확인
+
+```bash
+gh api user --jq '.login'
+```
+
+### 라벨 준비
+
+브랜치 태그(`feature`, `fix`, `refactor`, `chore`, `docs`, `test`)를 라벨명으로 사용합니다.
+브랜치명에서 태그를 추출합니다 (예: `feature/task-002-route-skeleton` → `feature`).
+
+해당 라벨이 레포에 존재하는지 확인합니다:
+
+```bash
+gh label list --json name --jq '.[].name'
+```
+
+라벨이 없으면 태그별 색상으로 생성합니다:
+
+| 태그 | 색상 |
+|------|------|
+| `feature` | `0075ca` |
+| `fix` | `d73a4a` |
+| `refactor` | `e4e669` |
+| `chore` | `cfd3d7` |
+| `docs` | `0052cc` |
+| `test` | `bfd4f2` |
+
+```bash
+gh label create "<태그>" --color "<색상>" --description "<설명>"
+```
+
+## 6단계: PR 생성
 
 ```bash
 gh pr create \
   --base develop \
   --title "<PR 제목>" \
+  --assignee "<GitHub 사용자명>" \
+  --label "<브랜치 태그>" \
   --body "$(cat <<'EOF'
 <PR 본문>
 EOF
 )"
 ```
 
-## 6단계: PR URL 출력
+## 7단계: PR을 프로젝트에 연결
+
+`.env.local`에서 `GITHUB_PROJECT_ID`를 읽어 프로젝트에 PR을 추가합니다.
+`GITHUB_PROJECT_ID`가 없으면 이 단계를 건너뜁니다.
+
+```bash
+PROJECT_ID=$(grep GITHUB_PROJECT_ID .env.local 2>/dev/null | cut -d '=' -f2)
+if [ -n "$PROJECT_ID" ]; then
+  PR_ID=$(gh pr view --json id --jq '.id')
+  gh api graphql -f query="
+    mutation {
+      addProjectV2ItemById(input: {
+        projectId: \"$PROJECT_ID\"
+        contentId: \"$PR_ID\"
+      }) {
+        item { id }
+      }
+    }
+  "
+fi
+```
+
+## 8단계: PR URL 출력
 
 생성된 PR URL을 사용자에게 출력합니다.
