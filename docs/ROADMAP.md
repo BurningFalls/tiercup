@@ -13,14 +13,14 @@
 
 | Phase | 내용 | 진행 상태 | Task 수 |
 |-------|------|-----------|---------|
-| Phase 1 | 프로젝트 초기 설정 및 골격 구축 | 미시작 | 5 |
+| Phase 1 | 프로젝트 초기 설정 및 골격 구축 | 진행중 | 5 |
 | Phase 2 | 핵심 기능 구현 | 미시작 | 15 |
 | Phase 3 | 부가 기능 구현 | 미시작 | 8 |
 | Phase 4 | UI/UX 완성도 향상 및 최적화 | 미시작 | 4 |
 | Phase 5 | 배포 및 런칭 | 미시작 | 3 |
 | **합계** | | | **35** |
 
-**전체 진행률**: 0 / 35 완료 (0%)
+**전체 진행률**: 4 / 35 완료 (11%)
 
 ---
 
@@ -81,16 +81,16 @@
 
 ### Task 004 — Supabase 데이터베이스 및 Storage 구축
 
-- [ ] Supabase 프로젝트 생성 및 연결 설정
-- [ ] DB 테이블 생성 마이그레이션 작성 및 적용
+- [x] Supabase 프로젝트 생성 및 연결 설정
+- [x] DB 테이블 생성 마이그레이션 작성 및 적용
   - `tier_cups`: id, play_code, manage_code, title, play_count, like_count, created_at, updated_at
   - `items`: id, tier_cup_id, name, image_url, display_order, created_at
   - `play_sessions`: id, tier_cup_id, result_code, status, comparison_count, started_at, completed_at
   - `comparisons`: id, play_session_id, winner_item_id, loser_item_id, created_at
   - `play_results`: id, play_session_id, item_id, tier, tier_order
   - `likes`: id, tier_cup_id, client_id, created_at (UNIQUE: tier_cup_id + client_id)
-- [ ] Supabase Storage 버킷 생성 및 이미지 업로드 정책 설정
-- [ ] Supabase 클라이언트 초기화 (`lib/supabase.ts`)
+- [x] Supabase Storage 버킷 생성 및 이미지 업로드 정책 설정
+- [x] Supabase 클라이언트 초기화 (`lib/supabase.ts`)
 
 ### Task 005 — 공통 유틸 및 헬퍼 함수 구현
 
