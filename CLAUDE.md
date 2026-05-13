@@ -78,18 +78,16 @@ ROADMAP.md 기반 task 실행 요청이 오면:
 
 ## 6. 작업 완료 시 Slack 알림
 
-작업을 완료하고 사용자에게 결과를 보고할 때, 반드시 아래 절차대로 `#claude-alerts` 채널(channel_id: `C0B3E5D3HCN`)에 알림을 전송한다.
+작업을 완료하고 사용자에게 결과를 보고할 때, 반드시 아래 절차대로 Slack `#claude-alerts` 채널에 알림을 전송한다.
 
 1. `date '+%Y-%m-%d %H:%M'` Bash 명령으로 현재 시간을 가져온다.
 2. `git branch --show-current` Bash 명령으로 현재 브랜치를 가져온다.
-3. `slack_send_message` MCP 도구로 아래 형식의 메시지를 전송한다.
+3. 아래 curl 명령으로 Incoming Webhook을 통해 메시지를 전송한다.
 
-```
-✅ *Claude 작업 완료*
-• *작업*: [한 작업 한 줄 요약]
-• *브랜치*: [현재 git 브랜치]
-• *다음 액션*: [사용자가 해야 할 다음 단계]
-• *완료 시간*: [date 명령 결과]
+```bash
+curl -s -X POST -H 'Content-type: application/json' \
+  --data '{"text":"✅ *Claude 작업 완료*\n• *작업*: [한 작업 한 줄 요약]\n• *브랜치*: [현재 git 브랜치]\n• *다음 액션*: [사용자가 해야 할 다음 단계]\n• *완료 시간*: [date 명령 결과]"}' \
+  '$SLACK_WEBHOOK_URL'
 ```
 
 조건:
