@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif']
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024
+export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif']
+export const MAX_IMAGE_SIZE = 5 * 1024 * 1024
 
 export const itemSchema = z.object({
   name: z.string().min(1, '아이템 이름을 입력하세요').max(50, '50자 이하로 입력하세요'),
