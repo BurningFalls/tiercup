@@ -7,5 +7,8 @@ export function formatDuration(seconds: number): string {
 
 export function calcDurationSeconds(startedAt: string, completedAt: string | null): number {
   if (!completedAt) return 0
-  return Math.floor((new Date(completedAt).getTime() - new Date(startedAt).getTime()) / 1000)
+  const start = new Date(startedAt).getTime()
+  const end = new Date(completedAt).getTime()
+  if (isNaN(start) || isNaN(end)) return 0
+  return Math.floor((end - start) / 1000)
 }
