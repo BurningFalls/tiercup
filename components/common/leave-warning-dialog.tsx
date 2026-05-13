@@ -40,7 +40,13 @@ export function LeaveWarningDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             취소
           </Button>
-          <Button variant="destructive" onClick={onConfirm}>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              onConfirm()
+              onOpenChange(false)
+            }}
+          >
             페이지 떠나기
           </Button>
         </DialogFooter>
