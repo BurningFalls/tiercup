@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
@@ -23,7 +24,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${geistSans.className} antialiased`}>
-        <Navbar />
+        <Suspense fallback={<div className="h-14 border-b" />}>
+          <Navbar />
+        </Suspense>
         {children}
         <Toaster />
       </body>
