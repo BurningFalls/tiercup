@@ -20,7 +20,7 @@
 | Phase 5 | 배포 및 런칭 | 미시작 | 3 |
 | **합계** | | | **35** |
 
-**전체 진행률**: 4 / 35 완료 (11%)
+**전체 진행률**: 5 / 35 완료 (14%)
 
 ---
 
@@ -94,11 +94,11 @@
 
 ### Task 005 — 공통 유틸 및 헬퍼 함수 구현
 
-- [ ] client_id 생성 및 localStorage 저장/조회 유틸 (UUID v4)
-- [ ] 클립보드 복사 유틸
-- [ ] 날짜/시간 포맷 유틸 (소요 시간 계산)
-- [ ] 이미지 유효성 검사 유틸 (형식: JPG/PNG/GIF, 크기: 5MB 이하)
-- [ ] Supabase Route Handler 클라이언트 유틸 (`lib/supabase-server.ts`)
+- [x] client_id 생성 및 localStorage 저장/조회 유틸 (UUID v4)
+- [x] 클립보드 복사 유틸
+- [x] 날짜/시간 포맷 유틸 (소요 시간 계산)
+- [x] 이미지 유효성 검사 유틸 (형식: JPG/PNG/GIF, 크기: 5MB 이하)
+- [x] Supabase Route Handler 클라이언트 유틸 (`lib/supabase-server.ts`)
 
 ---
 
