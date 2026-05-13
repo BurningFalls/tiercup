@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${geistSans.className} antialiased`}>
-        <Suspense>
+        <Suspense fallback={<div className="h-14 border-b" />}>
           <Navbar />
         </Suspense>
         {children}

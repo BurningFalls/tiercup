@@ -24,6 +24,7 @@ export function TierCupCard({
     <Card className="group flex flex-col overflow-hidden transition-shadow hover:shadow-md">
       <Link href={`/play/${tiercup.play_code}`} className="block">
         <div className="relative aspect-video w-full overflow-hidden bg-muted">
+          {/* TODO: tiercup.thumbnail_url 필드가 추가되면 next/image로 교체 */}
           <div className="flex h-full items-center justify-center text-muted-foreground">
             <ImageIcon className="size-10 opacity-40" />
           </div>
