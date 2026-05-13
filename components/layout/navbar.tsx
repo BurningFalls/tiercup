@@ -51,7 +51,7 @@ export default function Navbar() {
           size="icon"
           className="md:hidden"
           onClick={() => setMobileOpen((prev) => !prev)}
-          aria-label="메뉴 열기"
+          aria-label={mobileOpen ? "메뉴 닫기" : "메뉴 열기"}
         >
           {mobileOpen ? <XIcon /> : <MenuIcon />}
         </Button>
@@ -64,7 +64,12 @@ export default function Navbar() {
               <Link
                 key={href}
                 href={href}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                className={cn(
+                  "text-sm font-medium",
+                  pathname === href
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
                 onClick={() => setMobileOpen(false)}
               >
                 {label}
