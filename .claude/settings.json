@@ -19,6 +19,7 @@
     "serena@claude-plugins-official": false,
     "hookify@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
-    "notion@claude-plugins-official": true
+    "notion@claude-plugins-official": true,
+    "slack@claude-plugins-official": true
   }
 }
