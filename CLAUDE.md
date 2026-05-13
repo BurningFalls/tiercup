@@ -73,3 +73,25 @@ ROADMAP.md 기반 task 실행 요청이 오면:
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+---
+
+## 6. 작업 완료 시 Slack 알림
+
+작업을 완료하고 사용자에게 결과를 보고할 때, 반드시 아래 절차대로 `#claude-alerts` 채널(channel_id: `C0B3E5D3HCN`)에 알림을 전송한다.
+
+1. `date '+%Y-%m-%d %H:%M'` Bash 명령으로 현재 시간을 가져온다.
+2. `git branch --show-current` Bash 명령으로 현재 브랜치를 가져온다.
+3. `slack_send_message` MCP 도구로 아래 형식의 메시지를 전송한다.
+
+```
+✅ *Claude 작업 완료*
+• *작업*: [한 작업 한 줄 요약]
+• *브랜치*: [현재 git 브랜치]
+• *다음 액션*: [사용자가 해야 할 다음 단계]
+• *완료 시간*: [date 명령 결과]
+```
+
+조건:
+- 사용자 요청에 대한 구현/수정/설정이 완료된 시점에 전송한다.
+- 단순 질문 답변이나 조회성 작업은 전송하지 않는다.

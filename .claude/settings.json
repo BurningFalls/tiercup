@@ -10,6 +10,21 @@
           }
         ]
       }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "mcp_tool",
+            "server": "plugin:slack:slack",
+            "tool": "slack_send_message",
+            "input": {
+              "channel_id": "C0B3E5D3HCN",
+              "message": "⚠️ *Claude 입력 대기 중*\n• *내용*: ${message}\n• *디렉토리*: ${cwd}"
+            }
+          }
+        ]
+      }
     ]
   },
   "enabledPlugins": {
@@ -19,6 +34,7 @@
     "serena@claude-plugins-official": false,
     "hookify@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
-    "notion@claude-plugins-official": true
+    "notion@claude-plugins-official": true,
+    "slack@claude-plugins-official": true
   }
 }
