@@ -29,8 +29,8 @@ export function ExploreClient({
 }: ExploreClientProps) {
   const router = useRouter()
 
-  const [tierCups] = useState<TierCup[]>(initialTierCups)
-  const [total] = useState(initialTotal)
+  const tierCups = initialTierCups
+  const total = initialTotal
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set())
 
   const sort = initialSort

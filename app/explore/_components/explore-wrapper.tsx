@@ -1,7 +1,8 @@
+import type { TierCup } from "@/lib/types"
 import type { SortType } from "./sort-tabs"
 import { ExploreClient } from "./explore-client"
 
-const VALID_SORTS = new Set<SortType>(["popular", "likes", "recent"])
+const VALID_SORTS = new Set<SortType>(["popular", "likes", "latest"])
 
 interface ExploreWrapperProps {
   searchParams: Promise<{ sort?: string; page?: string; search?: string }>
@@ -18,7 +19,7 @@ export async function ExploreWrapper({ searchParams }: ExploreWrapperProps) {
   const search = params.search ?? ""
 
   // Task 018 (API 구현) 완료 후 실제 Supabase 쿼리로 교체
-  const tierCups: [] = []
+  const tierCups: TierCup[] = []
   const total = 0
 
   return (

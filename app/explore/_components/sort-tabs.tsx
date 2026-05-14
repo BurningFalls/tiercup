@@ -3,12 +3,12 @@
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-export type SortType = "popular" | "likes" | "recent"
+export type SortType = "popular" | "likes" | "latest"
 
 const SORT_OPTIONS: { value: SortType; label: string }[] = [
   { value: "popular", label: "🔥 인기순" },
   { value: "likes", label: "❤️ 좋아요순" },
-  { value: "recent", label: "🆕 최신순" },
+  { value: "latest", label: "🆕 최신순" },
 ]
 
 interface SortTabsProps {
