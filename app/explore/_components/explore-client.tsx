@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { SearchBar } from "@/components/common/search-bar"
 import { Pagination } from "@/components/common/pagination"
@@ -28,33 +28,26 @@ export function ExploreClient({
   initialSearch,
 }: ExploreClientProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   const [tierCups] = useState<TierCup[]>(initialTierCups)
   const [total] = useState(initialTotal)
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set())
 
-  const sort = (searchParams.get("sort") as SortType) || initialSort
-  const page = Number(searchParams.get("page")) || initialPage
-  const search = searchParams.get("search") ?? initialSearch
-
+  const sort = initialSort
+  const page = initialPage
+  const search = initialSearch
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
   const pushParams = useCallback(
     (params: Partial<{ sort: SortType; page: number; search: string }>) => {
-      const next = new URLSearchParams(searchParams.toString())
-      if (params.sort !== undefined) next.set("sort", params.sort)
-      if (params.page !== undefined) next.set("page", String(params.page))
-      if (params.search !== undefined) {
-        if (params.search) {
-          next.set("search", params.search)
-        } else {
-          next.delete("search")
-        }
-      }
+      const next = new URLSearchParams()
+      next.set("sort", params.sort ?? initialSort)
+      next.set("page", String(params.page ?? initialPage))
+      const q = params.search !== undefined ? params.search : initialSearch
+      if (q) next.set("search", q)
       router.push(`/explore?${next.toString()}`)
     },
-    [router, searchParams]
+    [router, initialSort, initialPage, initialSearch]
   )
 
   const handleSortChange = (nextSort: SortType) => {
