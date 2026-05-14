@@ -32,5 +32,8 @@
     "notion@claude-plugins-official": true,
     "slack@claude-plugins-official": true,
     "codex@openai-codex": true
+  },
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   }
 }

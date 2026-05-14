@@ -49,3 +49,9 @@ next-env.d.ts
 
 # notion dev log
 .claude/skills/notion-dev-log/notion-dev-log-state.json
+
+# claude worktrees
+.claude/worktrees/
+
+# playwright cli
+.playwright-cli/
