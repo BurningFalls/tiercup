@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { BarChart2Icon, HeartIcon, PencilIcon, RefreshCwIcon, Share2Icon, TrophyIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,11 +18,12 @@ interface ResultClientProps {
   resultData: PlayResultsResponse
   tierCup: TierCup
   resultCode: string
-  isSharedMode: boolean
 }
 
-export function ResultClient({ resultData, tierCup, resultCode, isSharedMode }: ResultClientProps) {
+export function ResultClient({ resultData, tierCup, resultCode }: ResultClientProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isSharedMode = searchParams.get('mode') === 'shared'
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [liked, setLiked] = useState(false)
 

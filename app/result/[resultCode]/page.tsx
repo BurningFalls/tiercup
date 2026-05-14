@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { mockResultData, mockTierCupForResult } from '@/lib/mock/result'
 import { ResultClient } from '@/components/result/result-client'
 
@@ -5,20 +6,24 @@ import { ResultClient } from '@/components/result/result-client'
 // TODO: isSharedMode는 서버에서 세션 소유권 확인으로 교체
 interface ResultPageProps {
   params: Promise<{ resultCode: string }>
-  searchParams: Promise<{ mode?: string }>
 }
 
-export default async function ResultPage({ params, searchParams }: ResultPageProps) {
+export default function ResultPage({ params }: ResultPageProps) {
+  return (
+    <Suspense>
+      <ResultContent params={params} />
+    </Suspense>
+  )
+}
+
+async function ResultContent({ params }: ResultPageProps) {
   const { resultCode } = await params
-  const { mode } = await searchParams
-  const isSharedMode = mode === 'shared'
 
   return (
     <ResultClient
       resultData={mockResultData}
       tierCup={mockTierCupForResult}
       resultCode={resultCode}
-      isSharedMode={isSharedMode}
     />
   )
 }
