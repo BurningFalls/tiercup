@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { BarChart2Icon, HeartIcon, PencilIcon, RefreshCwIcon, Share2Icon, TrophyIcon } from 'lucide-react'
+import { BarChart2Icon, CheckIcon, HeartIcon, PencilIcon, RefreshCwIcon, Share2Icon, TrophyIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ResultTierList } from '@/components/result/result-tier-list'
@@ -10,9 +10,7 @@ import { ResultStats } from '@/components/result/result-stats'
 import { ShareModal } from '@/components/result/share-modal'
 import { copyToClipboard } from '@/lib/utils/clipboard'
 import { cn } from '@/lib/utils'
-import type { Item, PlayResult, PlayResultsResponse, TierCup } from '@/lib/types'
-
-type ResultWithItem = PlayResult & { item: Item }
+import type { PlayResultsResponse, ResultWithItem, TierCup } from '@/lib/types'
 
 interface ResultClientProps {
   resultData: PlayResultsResponse
@@ -26,8 +24,9 @@ export function ResultClient({ resultData, tierCup, resultCode }: ResultClientPr
   const isSharedMode = searchParams.get('mode') === 'shared'
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [liked, setLiked] = useState(false)
+  const [shareCopied, setShareCopied] = useState(false)
 
-  const results = resultData.results as ResultWithItem[]
+  const results: ResultWithItem[] = resultData.results
   const totalItems = results.length
 
   const handleLike = useCallback(() => {
@@ -37,7 +36,11 @@ export function ResultClient({ resultData, tierCup, resultCode }: ResultClientPr
 
   const handleShareCopy = useCallback(async () => {
     const url = `${window.location.origin}/result/${resultCode}?mode=shared`
-    await copyToClipboard(url)
+    const ok = await copyToClipboard(url)
+    if (ok) {
+      setShareCopied(true)
+      setTimeout(() => setShareCopied(false), 2000)
+    }
   }, [resultCode])
 
   return (
@@ -48,7 +51,7 @@ export function ResultClient({ resultData, tierCup, resultCode }: ResultClientPr
           <TrophyIcon className="size-7 text-yellow-500" />
           <h1 className="text-2xl font-bold">{tierCup.title}</h1>
         </div>
-        <p className="mt-1 text-sm text-muted-foreground">{tierCup.title} 결과</p>
+        <p className="mt-1 text-sm text-muted-foreground">최종 결과</p>
       </div>
 
       {/* 본문 */}
@@ -95,8 +98,8 @@ export function ResultClient({ resultData, tierCup, resultCode }: ResultClientPr
                   전체 통계 보기
                 </Button>
                 <Button variant="outline" className="w-full" onClick={handleShareCopy}>
-                  <Share2Icon className="size-4" />
-                  이 결과 공유하기
+                  {shareCopied ? <CheckIcon className="size-4" /> : <Share2Icon className="size-4" />}
+                  {shareCopied ? '링크 복사됨' : '이 결과 공유하기'}
                 </Button>
               </div>
             </>

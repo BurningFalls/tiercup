@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CheckIcon, CopyIcon, Share2Icon } from 'lucide-react'
 import {
   Dialog,
@@ -19,11 +19,11 @@ interface ShareModalProps {
 
 export function ShareModal({ open, onOpenChange, resultCode }: ShareModalProps) {
   const [copied, setCopied] = useState(false)
+  const [shareUrl, setShareUrl] = useState('')
 
-  const shareUrl =
-    typeof window !== 'undefined'
-      ? `${window.location.origin}/result/${resultCode}?mode=shared`
-      : `/result/${resultCode}?mode=shared`
+  useEffect(() => {
+    setShareUrl(`${window.location.origin}/result/${resultCode}?mode=shared`)
+  }, [resultCode])
 
   const handleCopy = async () => {
     const ok = await copyToClipboard(shareUrl)

@@ -1,8 +1,7 @@
+import Image from 'next/image'
 import { TierBadge } from '@/components/common/tier-badge'
 import { TIER_ORDER } from '@/lib/constants'
-import type { Item, PlayResult, Tier } from '@/lib/types'
-
-type ResultWithItem = PlayResult & { item: Item }
+import type { ResultWithItem, Tier } from '@/lib/types'
 
 interface ResultTierListProps {
   results: ResultWithItem[]
@@ -30,13 +29,13 @@ export function ResultTierList({ results }: ResultTierListProps) {
             <div className="flex flex-wrap gap-3">
               {items.map(({ item }) => (
                 <div key={item.id} className="flex flex-col items-center gap-1">
-                  <div className="size-16 overflow-hidden rounded-lg bg-muted">
+                  <div className="relative size-16 overflow-hidden rounded-lg bg-muted">
                     {item.image_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={item.image_url}
                         alt={item.name}
-                        className="h-full w-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                     ) : (
                       <div className="h-full w-full" />

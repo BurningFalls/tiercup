@@ -10,7 +10,7 @@ interface ResultPageProps {
 
 export default function ResultPage({ params }: ResultPageProps) {
   return (
-    <Suspense>
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><div className="text-muted-foreground">로딩 중...</div></div>}>
       <ResultContent params={params} />
     </Suspense>
   )
