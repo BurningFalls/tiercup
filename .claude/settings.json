@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "source /Users/burningfalls/03_github-repo/tiercup/.env.local && curl -s -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"⚠️ *Claude 입력 대기 중*\\\\n• *내용*: ${message}\\\\n• *디렉토리*: ${cwd}\\\"}\" \"$SLACK_WEBHOOK_URL\""
+            "command": "source /Users/burningfalls/03_github-repo/tiercup/.env.local && INPUT=$(cat) && MESSAGE=$(echo \"$INPUT\" | jq -r '.message // \"(내용 없음)\"') && BRANCH=$(git -C \"$(echo \"$INPUT\" | jq -r '.cwd // \".\"\")\" branch --show-current 2>/dev/null || echo \"(브랜치 없음)\") && NOW=$(date '+%Y-%m-%d %H:%M') && curl -s -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"⚠️ *Claude 입력 대기 중*\\\\n• *내용*: ${MESSAGE}\\\\n• *브랜치*: ${BRANCH}\\\\n• *시간*: ${NOW}\\\"}\" \"$SLACK_WEBHOOK_URL\""
           }
         ]
       }
