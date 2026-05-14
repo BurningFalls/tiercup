@@ -32,6 +32,7 @@ export function HomeClient({
     }
   }
 
+  // TODO: API 연동 시 서버에 좋아요 상태를 반영해야 함
   const handleLike = (tiercup: TierCup) => {
     setLikedIds((prev) => {
       const next = new Set(prev)
@@ -57,7 +58,6 @@ export function HomeClient({
       <div className="mb-8">
         <SearchBar
           onSearch={handleSearch}
-          placeholder="티어컵 검색..."
           className="mx-auto max-w-xl"
         />
       </div>

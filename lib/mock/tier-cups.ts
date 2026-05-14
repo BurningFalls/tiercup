@@ -1,12 +1,12 @@
 import type { TierCup } from "@/lib/types"
 
-const now = new Date().toISOString()
+const now = "2025-01-01T00:00:00.000Z"
 
 export const mockPopularTierCups: TierCup[] = [
   {
     id: "mock-pop-1",
     play_code: "abc123",
-    manage_code: "manage000001",
+    manage_code: "",
     title: "역대 최고의 마블 히어로는?",
     play_count: 12430,
     like_count: 3210,
@@ -16,7 +16,7 @@ export const mockPopularTierCups: TierCup[] = [
   {
     id: "mock-pop-2",
     play_code: "def456",
-    manage_code: "manage000002",
+    manage_code: "",
     title: "2000년대 최고의 애니메이션",
     play_count: 9870,
     like_count: 2540,
@@ -26,7 +26,7 @@ export const mockPopularTierCups: TierCup[] = [
   {
     id: "mock-pop-3",
     play_code: "ghi789",
-    manage_code: "manage000003",
+    manage_code: "",
     title: "역대 최고의 피자 토핑",
     play_count: 8120,
     like_count: 1980,
@@ -36,7 +36,7 @@ export const mockPopularTierCups: TierCup[] = [
   {
     id: "mock-pop-4",
     play_code: "jkl012",
-    manage_code: "manage000004",
+    manage_code: "",
     title: "최고의 K-POP 4세대 아이돌",
     play_count: 7650,
     like_count: 1750,
@@ -49,7 +49,7 @@ export const mockLikedTierCups: TierCup[] = [
   {
     id: "mock-like-1",
     play_code: "mno345",
-    manage_code: "manage000005",
+    manage_code: "",
     title: "내가 좋아하는 라면 순위",
     play_count: 4300,
     like_count: 5120,
@@ -59,7 +59,7 @@ export const mockLikedTierCups: TierCup[] = [
   {
     id: "mock-like-2",
     play_code: "pqr678",
-    manage_code: "manage000006",
+    manage_code: "",
     title: "역대 축구 레전드 티어",
     play_count: 6100,
     like_count: 4870,
@@ -69,7 +69,7 @@ export const mockLikedTierCups: TierCup[] = [
   {
     id: "mock-like-3",
     play_code: "stu901",
-    manage_code: "manage000007",
+    manage_code: "",
     title: "최애 스타벅스 음료 티어",
     play_count: 3900,
     like_count: 4310,
@@ -79,7 +79,7 @@ export const mockLikedTierCups: TierCup[] = [
   {
     id: "mock-like-4",
     play_code: "vwx234",
-    manage_code: "manage000008",
+    manage_code: "",
     title: "게임 역대 명작 RPG 순위",
     play_count: 5200,
     like_count: 3980,
@@ -92,7 +92,7 @@ export const mockRecentTierCups: TierCup[] = [
   {
     id: "mock-new-1",
     play_code: "yza567",
-    manage_code: "manage000009",
+    manage_code: "",
     title: "2024 최고의 영화는?",
     play_count: 120,
     like_count: 45,
@@ -102,7 +102,7 @@ export const mockRecentTierCups: TierCup[] = [
   {
     id: "mock-new-2",
     play_code: "bcd890",
-    manage_code: "manage000010",
+    manage_code: "",
     title: "편의점 디저트 티어표",
     play_count: 85,
     like_count: 30,
@@ -112,7 +112,7 @@ export const mockRecentTierCups: TierCup[] = [
   {
     id: "mock-new-3",
     play_code: "efg123",
-    manage_code: "manage000011",
+    manage_code: "",
     title: "국내 여행지 베스트 티어",
     play_count: 67,
     like_count: 22,
@@ -122,7 +122,7 @@ export const mockRecentTierCups: TierCup[] = [
   {
     id: "mock-new-4",
     play_code: "hij456",
-    manage_code: "manage000012",
+    manage_code: "",
     title: "드라마 OST 명곡 모음",
     play_count: 43,
     like_count: 18,
