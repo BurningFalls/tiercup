@@ -100,8 +100,10 @@ export interface SubmitComparisonRequest {
   loser_item_id: string
 }
 
+export type ResultWithItem = PlayResult & { item: Item }
+
 export interface PlayResultsResponse {
-  results: (PlayResult & { item: Item })[]
+  results: ResultWithItem[]
   comparison_count: number
   started_at: string
   completed_at: string | null
