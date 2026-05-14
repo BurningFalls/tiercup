@@ -1,8 +1,17 @@
+import { HomeClient } from "@/components/home/home-client"
+import {
+  mockPopularTierCups,
+  mockLikedTierCups,
+  mockRecentTierCups,
+} from "@/lib/mock/tier-cups"
+
 export default function HomePage() {
+  // Task 025에서 Supabase 쿼리로 교체 예정
   return (
-    <main className="mx-auto max-w-screen-xl px-4 py-8">
-      <h1 className="text-2xl font-bold">TierCup</h1>
-      <p className="mt-2 text-muted-foreground">Coming Soon</p>
-    </main>
-  );
+    <HomeClient
+      popularTierCups={mockPopularTierCups}
+      likedTierCups={mockLikedTierCups}
+      recentTierCups={mockRecentTierCups}
+    />
+  )
 }
