@@ -1,6 +1,8 @@
 import type { Item, Tier, TierCup } from '@/lib/types'
 import type { NextPairResponse } from '@/lib/types'
 
+// 주의: manage_code는 플레이 화면에서 사용되지 않는 관리용 코드입니다.
+// 실제 API 연동 시 플레이 화면에 manage_code를 노출하지 않도록 서버 응답을 제한해야 합니다.
 export const mockTierCupForPlay: TierCup = {
   id: 'mock-tier-cup-001',
   play_code: 'abc123',

@@ -29,6 +29,8 @@ export function ItemCard({ item, isHighlighted, isDisabled, onClick }: ItemCardP
     >
       <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-muted">
         {item.image_url && !imgError ? (
+          // next/image 미사용 이유: 외부 이미지 도메인 설정이 아직 미정이라 <img> 임시 사용
+          // TODO: next.config.ts remotePatterns 설정 후 next/image로 교체
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={item.image_url}

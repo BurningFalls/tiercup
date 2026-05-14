@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button'
 import { TierBadge } from '@/components/common/tier-badge'
+import { TIER_ORDER } from '@/lib/constants'
+import { groupItemsByTier } from '@/lib/utils'
 import type { Item, Tier } from '@/lib/types'
-
-const TIER_ORDER: Tier[] = ['S', 'A', 'B', 'C', 'D', 'F', '?']
 
 interface TierSidebarProps {
   items: Item[]
@@ -11,13 +11,7 @@ interface TierSidebarProps {
 }
 
 export function TierSidebar({ items, tierMap, onFinishEarly }: TierSidebarProps) {
-  const grouped = TIER_ORDER.reduce<Record<Tier, Item[]>>(
-    (acc, tier) => {
-      acc[tier] = items.filter((item) => tierMap[item.id] === tier)
-      return acc
-    },
-    {} as Record<Tier, Item[]>,
-  )
+  const grouped = groupItemsByTier(items, tierMap)
 
   return (
     <div className="flex h-full flex-col gap-2">
@@ -41,7 +35,7 @@ export function TierSidebar({ items, tierMap, onFinishEarly }: TierSidebarProps)
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="h-full w-full bg-muted" />
+                    <div className="h-full w-full" />
                   )}
                 </div>
               ))}

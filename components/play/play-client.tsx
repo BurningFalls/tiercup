@@ -2,14 +2,18 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+// TODO: 실제 API 연동 시 mockInitialTierMap → props 또는 서버 응답으로 교체
+// TODO: 실제 API 연동 시 mockTierUpdates → SubmitComparison API 응답으로 교체
 import { mockInitialTierMap, mockTierUpdates } from '@/lib/mock/play-session'
 import { PlayHeader } from '@/components/play/play-header'
 import { ComparisonArea } from '@/components/play/comparison-area'
 import { TierSidebar } from '@/components/play/tier-sidebar'
 import { MobileTierDrawer } from '@/components/play/mobile-tier-drawer'
 import { LeaveWarningDialog } from '@/components/common/leave-warning-dialog'
-import type { Item, Tier, TierCup } from '@/lib/types'
-import type { NextPairResponse } from '@/lib/types'
+import type { Item, NextPairResponse, Tier, TierCup } from '@/lib/types'
+
+// ItemCard의 transition-all duration-300과 맞춰야 함
+const HIGHLIGHT_DURATION_MS = 300
 
 interface PlayClientProps {
   tierCup: TierCup
@@ -54,19 +58,17 @@ export function PlayClient({ tierCup, items, initialPairs }: PlayClientProps) {
 
       setTimeout(() => {
         setHighlightedItemId(null)
-
-        const nextIndex = currentPairIndex + 1
-
-        // mock 티어 업데이트 적용
-        const updates = mockTierUpdates[nextIndex]
-        if (updates) {
-          setTierMap((prev) => ({ ...prev, ...updates }))
-        }
-
-        setCurrentPairIndex(nextIndex)
-      }, 300)
+        setCurrentPairIndex((prev) => {
+          const nextIndex = prev + 1
+          const updates = mockTierUpdates[nextIndex]
+          if (updates) {
+            setTierMap((tierPrev) => ({ ...tierPrev, ...updates }))
+          }
+          return nextIndex
+        })
+      }, HIGHLIGHT_DURATION_MS)
     },
-    [highlightedItemId, currentPairIndex],
+    [highlightedItemId],
   )
 
   const handleFinishEarly = useCallback(() => {
