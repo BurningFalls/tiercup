@@ -62,6 +62,8 @@ export default function CreateForm() {
   function handleLeaveConfirm() {
     if (pendingNavigation) {
       router.push(pendingNavigation)
+      setPendingNavigation(null)
+      setLeaveDialogOpen(false)
     }
   }
 

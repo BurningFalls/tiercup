@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import Image from "next/image"
 import { XIcon, ImageIcon } from "lucide-react"
 import {
@@ -35,12 +35,23 @@ export function ItemCard({
 }: ItemCardProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const imageFile = watch(`items.${index}.image`)
-  const previewUrl = imageFile ? URL.createObjectURL(imageFile) : null
+  const previewUrl = useMemo(
+    () => (imageFile ? URL.createObjectURL(imageFile) : null),
+    [imageFile]
+  )
   const nameError = errors.items?.[index]?.name?.message
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
+    }
+  }, [previewUrl])
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    // Note: itemSchema의 Zod refine과 동일한 검증이지만,
+    // 파일 선택 즉시 toast 피드백을 주기 위해 의도적으로 중복 처리
     const { valid, error } = validateImage(file)
     if (!valid) {
       toast.error(error)
@@ -55,6 +66,7 @@ export function ItemCard({
       <div className="relative">
         <button
           type="button"
+          aria-label={`아이템 ${index + 1} 이미지 선택`}
           onClick={() => fileInputRef.current?.click()}
           className="relative flex h-36 w-full items-center justify-center overflow-hidden rounded-md bg-muted transition-opacity hover:opacity-80"
         >
