@@ -62,6 +62,10 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ---
 
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+---
+
 ## 5. Task 실행 브랜치 관리
 
 ROADMAP.md 기반 task 실행 요청이 오면:
@@ -72,11 +76,22 @@ ROADMAP.md 기반 task 실행 요청이 오면:
 
 ---
 
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+## 6. 구현 완료 후 빌드 검증
+
+코드 구현/수정이 완료되면 반드시 아래 순서로 빌드를 검증한다.
+
+```bash
+rm -rf .next && npm run build
+```
+
+조건:
+- UI 컴포넌트, 페이지, API 등 코드 변경이 수반된 모든 작업에 적용한다.
+- 단순 설정 파일 변경(CLAUDE.md, .env 등)은 제외한다.
+- 빌드 실패 시 원인을 수정한 후 재검증하고, 통과된 이후에 사용자에게 결과를 보고한다.
 
 ---
 
-## 6. 작업 완료 시 Slack 알림
+## 7. 작업 완료 시 Slack 알림
 
 작업을 완료하고 사용자에게 결과를 보고할 때, 반드시 아래 절차대로 Slack `#claude-alerts` 채널에 알림을 전송한다.
 
