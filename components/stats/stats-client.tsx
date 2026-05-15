@@ -1,6 +1,4 @@
-"use client"
-
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { BarChart2Icon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StatsOverview } from '@/components/stats/stats-overview'
@@ -15,8 +13,6 @@ interface StatsClientProps {
 }
 
 export function StatsClient({ statsData, tierCup, items }: StatsClientProps) {
-  const router = useRouter()
-
   return (
     <div className="mx-auto max-w-screen-xl px-4 py-8">
       {/* 헤더 */}
@@ -52,14 +48,13 @@ export function StatsClient({ statsData, tierCup, items }: StatsClientProps) {
         <StatsHeatmap
           tierDistribution={statsData.tier_distribution}
           items={items}
-          totalPlays={statsData.total_plays}
         />
       </div>
 
       {/* 나도 해보기 */}
       <div className="mt-8 text-center">
-        <Button size="lg" onClick={() => router.push(`/play/${tierCup.play_code}`)}>
-          나도 해보기
+        <Button size="lg" asChild>
+          <Link href={`/play/${tierCup.play_code}`}>나도 해보기</Link>
         </Button>
       </div>
     </div>

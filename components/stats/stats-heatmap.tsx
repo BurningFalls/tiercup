@@ -28,10 +28,9 @@ const TIER_BG: Record<Tier, string> = {
 interface StatsHeatmapProps {
   tierDistribution: Record<string, Record<Tier, number>>
   items: Item[]
-  totalPlays: number
 }
 
-export function StatsHeatmap({ tierDistribution, items, totalPlays }: StatsHeatmapProps) {
+export function StatsHeatmap({ tierDistribution, items }: StatsHeatmapProps) {
   return (
     <div className="rounded-lg border">
       <div className="border-b px-4 py-3">
@@ -45,7 +44,7 @@ export function StatsHeatmap({ tierDistribution, items, totalPlays }: StatsHeatm
             <tr>
               <th className="w-36 px-4 py-2 text-left text-xs font-medium text-muted-foreground">아이템</th>
               {DISPLAY_TIERS.map((tier) => (
-                <th key={tier} className="px-2 py-2 text-center text-xs font-bold" style={{ minWidth: 52 }}>
+                <th key={tier} className="px-2 py-2 text-center text-xs font-bold min-w-[52px]">
                   {tier}
                 </th>
               ))}
@@ -73,7 +72,8 @@ export function StatsHeatmap({ tierDistribution, items, totalPlays }: StatsHeatm
                   {/* 티어별 셀 */}
                   {DISPLAY_TIERS.map((tier) => {
                     const count = dist[tier] ?? 0
-                    const pct = totalPlays > 0 ? Math.round((count / totalPlays) * 100) : 0
+                    const total = Object.values(dist).reduce((a, b) => a + b, 0)
+                    const pct = total > 0 ? Math.round((count / total) * 100) : 0
                     return (
                       <td key={tier} className="px-2 py-2 text-center">
                         <div

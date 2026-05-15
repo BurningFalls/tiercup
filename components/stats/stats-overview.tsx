@@ -15,7 +15,7 @@ export function StatsOverview({ totalPlays, totalComparisons, avgDurationSeconds
   ]
 
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       {items.map(({ icon: Icon, label, value }) => (
         <div key={label} className="flex flex-col items-center gap-1 rounded-lg border p-4 text-center">
           <Icon className="size-5 text-muted-foreground" />
