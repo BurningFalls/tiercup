@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { ResultTierList } from '@/components/result/result-tier-list'
 import { mockResultData } from '@/lib/mock/result'
