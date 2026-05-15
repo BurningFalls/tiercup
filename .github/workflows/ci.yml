@@ -30,6 +30,7 @@ jobs:
       - name: ESLint
         run: npm run lint
 
+      # E2E 테스트(test:e2e)는 개발 서버 기동이 필요하여 CI 비용이 크므로 별도 수동 실행으로 관리
       - name: Unit & Component Tests
         run: npm test
 
