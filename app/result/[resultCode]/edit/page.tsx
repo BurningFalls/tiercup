@@ -15,6 +15,7 @@ export default function ResultEditPage({ params }: ResultEditPageProps) {
   )
 }
 
+// Suspense와 함께 사용하려면 async 컴포넌트를 별도로 분리해야 함
 async function ResultEditContent({ params }: ResultEditPageProps) {
   const { resultCode } = await params
 

@@ -40,7 +40,6 @@ export function ResultEditClient({ resultData, tierCup, resultCode }: ResultEdit
   const [saveError, setSaveError] = useState<string | null>(null)
 
   const [activeId, setActiveId] = useState<string | null>(null)
-  const [dragType, setDragType] = useState<'item' | 'tier' | null>(null)
 
   const isDirty = useMemo(
     () => results.some((r) => tierMap[r.item.id] !== initialTierMap[r.item.id]),
@@ -62,16 +61,13 @@ export function ResultEditClient({ resultData, tierCup, resultCode }: ResultEdit
   }, [results, tierMap])
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
-    const id = String(event.active.id)
-    setActiveId(id)
-    setDragType(id.startsWith('tier-') ? 'tier' : 'item')
+    setActiveId(String(event.active.id))
   }, [])
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event
       setActiveId(null)
-      setDragType(null)
 
       if (!over) return
 
@@ -85,24 +81,23 @@ export function ResultEditClient({ resultData, tierCup, resultCode }: ResultEdit
 
       if (!targetTier) return
 
-      if (dragType === 'item' || activeId.startsWith('item-')) {
+      if (activeId.startsWith('item-')) {
         const itemId = activeId.replace('item-', '')
         setTierMap((prev) => ({ ...prev, [itemId]: targetTier }))
-      } else if (dragType === 'tier' || activeId.startsWith('tier-')) {
+      } else if (activeId.startsWith('tier-')) {
         const sourceTier = activeId.replace('tier-', '') as Tier
         if (sourceTier === targetTier) return
         setTierMap((prev) => {
           const next = { ...prev }
           for (const r of results) {
-            if (next[r.item.id] === sourceTier) {
-              next[r.item.id] = targetTier
-            }
+            if (next[r.item.id] === sourceTier) next[r.item.id] = targetTier
+            else if (next[r.item.id] === targetTier) next[r.item.id] = sourceTier
           }
           return next
         })
       }
     },
-    [dragType, results],
+    [results],
   )
 
   const handleSave = useCallback(() => {
@@ -113,7 +108,6 @@ export function ResultEditClient({ resultData, tierCup, resultCode }: ResultEdit
     }
     setSaveError(null)
     // TODO: API 연동 시 PATCH /api/results/:resultCode 호출
-    console.log('저장할 tierMap:', tierMap)
     router.push(`/result/${resultCode}`)
   }, [results, tierMap, resultCode, router])
 

@@ -34,6 +34,7 @@ export function EditTierRow({ tier, items }: EditTierRowProps) {
 
   return (
     <div
+      ref={setDropRef}
       className={cn(
         'flex items-start gap-3 rounded-lg border p-3 transition-colors',
         isOver && 'border-primary bg-primary/5',
@@ -55,9 +56,8 @@ export function EditTierRow({ tier, items }: EditTierRowProps) {
       {/* 티어 배지 */}
       <TierBadge tier={tier} size="lg" className="mt-1 shrink-0" />
 
-      {/* 드롭 영역 + 아이템 목록 */}
+      {/* 아이템 목록 */}
       <div
-        ref={setDropRef}
         className="flex min-h-[4rem] flex-1 flex-wrap gap-3"
       >
         {items.map((result) => (

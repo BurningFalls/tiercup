@@ -29,6 +29,7 @@ export function EditItemCard({ result }: EditItemCardProps) {
         isDragging && 'opacity-40',
       )}
     >
+      {/* grip 핸들에만 listeners/attributes 적용 — 드래그 가능 힌트를 핸들에 집중 */}
       <div
         {...listeners}
         {...attributes}
