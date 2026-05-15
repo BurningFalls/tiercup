@@ -55,3 +55,8 @@ next-env.d.ts
 
 # playwright cli
 .playwright-cli/
+*.png
+
+# playwright test results
+/playwright-report/
+/test-results/
