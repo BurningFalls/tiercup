@@ -25,6 +25,10 @@ describe('itemSchema', () => {
     expect(itemSchema.safeParse({ name: '아이템' }).success).toBe(true)
   })
 
+  it('image: undefined를 명시적으로 전달해도 통과한다', () => {
+    expect(itemSchema.safeParse({ name: '아이템', image: undefined }).success).toBe(true)
+  })
+
   it('유효한 JPEG 이미지(1MB)를 통과한다', () => {
     const file = makeFile(1 * 1024 * 1024)
     expect(itemSchema.safeParse({ name: '아이템', image: file }).success).toBe(true)

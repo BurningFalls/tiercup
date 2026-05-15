@@ -1,11 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, afterEach, vi } from 'vitest'
 import { getClientId } from '@/lib/utils/client-id'
 
 describe('getClientId', () => {
-  beforeEach(() => {
-    localStorage.clear()
-  })
-
   it('SSR 환경(window undefined)에서는 빈 문자열을 반환한다', () => {
     vi.stubGlobal('window', undefined)
     expect(getClientId()).toBe('')
@@ -33,5 +29,6 @@ describe('getClientId', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals()
+    localStorage.clear()
   })
 })

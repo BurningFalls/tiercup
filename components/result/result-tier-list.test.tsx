@@ -46,7 +46,9 @@ describe('ResultTierList', () => {
 
   it('빈 결과 배열이면 아무것도 렌더링되지 않는다', () => {
     const { container } = render(<ResultTierList results={[]} />)
-    expect(container.querySelector('[class*="divide-y"]')?.children.length).toBe(0)
+    // 티어 뱃지가 하나도 없어야 함
+    expect(screen.queryByRole('img')).not.toBeInTheDocument()
+    expect(container.firstChild).toBeEmptyDOMElement()
   })
 
   it('아이템에 image_url이 없으면 img 태그 없이 렌더링된다', () => {

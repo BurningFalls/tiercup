@@ -38,7 +38,10 @@ describe('StatsHeatmap', () => {
     render(
       <StatsHeatmap tierDistribution={mockStatsData.tier_distribution} items={[]} />,
     )
-    expect(screen.queryAllByRole('row').length).toBe(1) // 헤더 행만
+    const rows = screen.queryAllByRole('row')
+    expect(rows).toHaveLength(1) // thead 헤더 행만 존재
+    // 데이터 셀(아이템명)이 없음을 추가 확인
+    expect(screen.queryByRole('cell')).not.toBeInTheDocument()
   })
 
   it('퍼센트 값이 셀 title 속성에 포함된다', () => {
@@ -46,9 +49,8 @@ describe('StatsHeatmap', () => {
       <StatsHeatmap tierDistribution={mockStatsData.tier_distribution} items={[mockItems[0]]} />,
     )
     // item-01의 S티어: 45/(45+30+15+7+2+1) = 45% (반올림)
-    const cells = document.querySelectorAll('[title]')
-    const sTierCell = Array.from(cells).find((el) => el.getAttribute('title')?.includes('45'))
-    expect(sTierCell).toBeTruthy()
+    const cell = screen.getByTitle(/45/)
+    expect(cell).toBeInTheDocument()
   })
 
   it('분포 데이터가 없는 아이템도 렌더링된다', () => {

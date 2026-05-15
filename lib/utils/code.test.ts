@@ -18,8 +18,9 @@ describe('generatePlayCode', () => {
   })
 
   it('호출마다 다른 값을 반환한다', () => {
-    const codes = new Set(Array.from({ length: 20 }, () => generatePlayCode()))
-    expect(codes.size).toBeGreaterThan(1)
+    const codes = new Set(Array.from({ length: 100 }, () => generatePlayCode()))
+    // 100개 중 90개 이상은 달라야 함 (nanoid 특성상 거의 모두 달라야 함)
+    expect(codes.size).toBeGreaterThan(90)
   })
 })
 
