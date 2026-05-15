@@ -179,8 +179,8 @@
 
 ### Task 015 — 티어컵 생성 API 구현 (F001)
 
-- [ ] `POST /api/tier-cups` — 티어컵 생성 (play_code + manage_code 발급)
-- [ ] `POST /api/tier-cups/:id/items` — 아이템 생성 (이미지 Supabase Storage 업로드)
+- [x] `POST /api/tier-cups` — 티어컵 생성 (play_code + manage_code 발급)
+- [x] `POST /api/tier-cups/:id/items` — 아이템 생성 (이미지 Supabase Storage 업로드)
 
 ### Task 016 — 위상정렬 알고리즘 구현 (F003)
 

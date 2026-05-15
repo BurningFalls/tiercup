@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { LeaveWarningDialog } from "@/components/common/leave-warning-dialog"
+import { ItemFailedDialog } from "@/components/create/item-failed-dialog"
 import { ItemCard } from "@/components/create/item-card"
 import { tierCupSchema, TierCupFormValues } from "@/lib/schemas"
 import { cn } from "@/lib/utils"
@@ -17,6 +18,7 @@ export default function CreateForm() {
   const router = useRouter()
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false)
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null)
+  const [failedManageCode, setFailedManageCode] = useState<string | null>(null)
 
   const {
     register,
@@ -67,9 +69,41 @@ export default function CreateForm() {
     }
   }
 
-  function onSubmit(data: TierCupFormValues) {
-    // TODO: Task 015에서 API 연동
-    console.log(data)
+  async function onSubmit(data: TierCupFormValues) {
+    const cupRes = await fetch('/api/tier-cups', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: data.title }),
+    })
+
+    if (!cupRes.ok) {
+      const { error } = await cupRes.json()
+      alert(error?.message ?? '티어컵 생성에 실패했습니다.')
+      return
+    }
+
+    const { id, play_code, manage_code } = await cupRes.json()
+
+    const results = await Promise.allSettled(
+      data.items.map((item, index) => {
+        const formData = new FormData()
+        formData.append('name', item.name)
+        formData.append('display_order', String(index))
+        if (item.image) formData.append('image', item.image)
+        else if (item.image_url) formData.append('image_url', item.image_url)
+        return fetch(`/api/tier-cups/${id}/items`, { method: 'POST', body: formData })
+      }),
+    )
+
+    const failed = results.filter(
+      (r) => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.ok),
+    )
+    if (failed.length > 0) {
+      setFailedManageCode(manage_code)
+      return
+    }
+
+    router.push(`/create/complete?play_code=${play_code}&manage_code=${manage_code}&title=${encodeURIComponent(data.title)}`)
   }
 
   return (
@@ -163,6 +197,12 @@ export default function CreateForm() {
           </Button>
         </div>
       </form>
+
+      <ItemFailedDialog
+        open={failedManageCode !== null}
+        manageCode={failedManageCode ?? ""}
+        onClose={() => setFailedManageCode(null)}
+      />
 
       <LeaveWarningDialog
         open={leaveDialogOpen}
