@@ -88,6 +88,17 @@ export const mockLikedTierCups: TierCup[] = [
   },
 ]
 
+export const mockCreatedTierCup: TierCup = {
+  id: "mock-created-1",
+  play_code: "AbCdEf",
+  manage_code: "XyZ123AbCd45",
+  title: "역대 최고의 K-pop 아이돌",
+  play_count: 0,
+  like_count: 0,
+  created_at: now,
+  updated_at: now,
+}
+
 export const mockRecentTierCups: TierCup[] = [
   {
     id: "mock-new-1",
