@@ -67,9 +67,39 @@ export default function CreateForm() {
     }
   }
 
-  function onSubmit(data: TierCupFormValues) {
-    // TODO: Task 015에서 API 연동
-    console.log(data)
+  async function onSubmit(data: TierCupFormValues) {
+    const cupRes = await fetch('/api/tier-cups', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: data.title }),
+    })
+
+    if (!cupRes.ok) {
+      const { error } = await cupRes.json()
+      alert(error?.message ?? '티어컵 생성에 실패했습니다.')
+      return
+    }
+
+    const { id, play_code, manage_code } = await cupRes.json()
+
+    const results = await Promise.allSettled(
+      data.items.map((item, index) => {
+        const formData = new FormData()
+        formData.append('name', item.name)
+        formData.append('display_order', String(index))
+        if (item.image) formData.append('image', item.image)
+        else if (item.image_url) formData.append('image_url', item.image_url)
+        return fetch(`/api/tier-cups/${id}/items`, { method: 'POST', body: formData })
+      }),
+    )
+
+    const failed = results.filter((r) => r.status === 'rejected' || !r.value.ok)
+    if (failed.length > 0) {
+      alert('일부 아이템 생성에 실패했습니다. 다시 시도해주세요.')
+      return
+    }
+
+    router.push(`/create/complete?play_code=${play_code}&manage_code=${manage_code}&title=${encodeURIComponent(data.title)}`)
   }
 
   return (
