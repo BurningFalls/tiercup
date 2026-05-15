@@ -93,9 +93,11 @@ export default function CreateForm() {
       }),
     )
 
-    const failed = results.filter((r) => r.status === 'rejected' || !r.value.ok)
+    const failed = results.filter(
+      (r) => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.ok),
+    )
     if (failed.length > 0) {
-      alert('일부 아이템 생성에 실패했습니다. 다시 시도해주세요.')
+      alert(`일부 아이템 생성에 실패했습니다. 관리 코드: ${manage_code}`)
       return
     }
 

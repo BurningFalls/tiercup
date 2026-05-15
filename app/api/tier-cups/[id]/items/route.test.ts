@@ -161,6 +161,26 @@ describe('POST /api/tier-cups/[id]/items', () => {
     expect(body.error.code).toBe('TIER_CUP_NOT_FOUND')
   })
 
+  it('DB 연결 오류(PGRST116 아닌 에러)이면 500 INTERNAL_ERROR를 반환한다', async () => {
+    mockCupSingle.mockResolvedValue({ data: null, error: { code: '08006', message: 'connection failure' } })
+
+    const req = makeRequestWithFormData({ name: '아이템', display_order: '0' })
+    const res = await POST(req, makeParams('1'))
+    const body = await res.json()
+
+    expect(res.status).toBe(500)
+    expect(body.error.code).toBe('INTERNAL_ERROR')
+  })
+
+  it('유효하지 않은 image_url이면 400 VALIDATION_ERROR를 반환한다', async () => {
+    const req = makeRequestWithFormData({ name: '아이템', display_order: '0', image_url: 'not-a-url' })
+    const res = await POST(req, makeParams('1'))
+    const body = await res.json()
+
+    expect(res.status).toBe(400)
+    expect(body.error.code).toBe('VALIDATION_ERROR')
+  })
+
   it('유효하지 않은 id이면 400을 반환한다', async () => {
     const req = makeRequestWithFormData({ name: '아이템', display_order: '0' })
     const res = await POST(req, makeParams('abc'))

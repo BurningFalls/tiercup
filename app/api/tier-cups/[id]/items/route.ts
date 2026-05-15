@@ -64,9 +64,15 @@ export async function POST(
     .single()
 
   if (cupError) {
+    const isNotFound = cupError.code === 'PGRST116'
     return NextResponse.json(
-      { error: { code: 'TIER_CUP_NOT_FOUND', message: '티어컵을 찾을 수 없습니다.' } },
-      { status: 404 },
+      {
+        error: {
+          code: isNotFound ? 'TIER_CUP_NOT_FOUND' : 'INTERNAL_ERROR',
+          message: isNotFound ? '티어컵을 찾을 수 없습니다.' : '서버 오류가 발생했습니다.',
+        },
+      },
+      { status: isNotFound ? 404 : 500 },
     )
   }
 
@@ -100,7 +106,15 @@ export async function POST(
     const { data: urlData } = supabase.storage.from('item-images').getPublicUrl(path)
     finalImageUrl = urlData.publicUrl
   } else if (typeof imageUrl === 'string' && imageUrl.length > 0) {
-    finalImageUrl = imageUrl
+    try {
+      new URL(imageUrl)
+      finalImageUrl = imageUrl
+    } catch {
+      return NextResponse.json(
+        { error: { code: 'VALIDATION_ERROR', message: '유효하지 않은 이미지 URL입니다.' } },
+        { status: 400 },
+      )
+    }
   }
 
   const { data, error } = await supabase

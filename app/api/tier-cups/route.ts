@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { generatePlayCode, generateManageCode } from '@/lib/utils/code'
-import { tierCupSchema } from '@/lib/schemas'
+import { z } from 'zod'
 
 export async function POST(request: NextRequest) {
   let body: unknown
@@ -14,7 +14,8 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const parsed = tierCupSchema.shape.title.safeParse((body as Record<string, unknown>)?.title)
+  const titleSchema = z.string().min(1, '제목을 입력하세요').max(30, '제목은 30자 이하로 입력하세요')
+  const parsed = titleSchema.safeParse((body as Record<string, unknown>)?.title)
   if (!parsed.success) {
     return NextResponse.json(
       { error: { code: 'VALIDATION_ERROR', message: parsed.error.issues[0].message } },
