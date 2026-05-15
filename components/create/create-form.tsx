@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { LeaveWarningDialog } from "@/components/common/leave-warning-dialog"
+import { ItemFailedDialog } from "@/components/create/item-failed-dialog"
 import { ItemCard } from "@/components/create/item-card"
 import { tierCupSchema, TierCupFormValues } from "@/lib/schemas"
 import { cn } from "@/lib/utils"
@@ -17,6 +18,7 @@ export default function CreateForm() {
   const router = useRouter()
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false)
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null)
+  const [failedManageCode, setFailedManageCode] = useState<string | null>(null)
 
   const {
     register,
@@ -97,7 +99,7 @@ export default function CreateForm() {
       (r) => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.ok),
     )
     if (failed.length > 0) {
-      alert(`일부 아이템 생성에 실패했습니다. 관리 코드: ${manage_code}`)
+      setFailedManageCode(manage_code)
       return
     }
 
@@ -195,6 +197,12 @@ export default function CreateForm() {
           </Button>
         </div>
       </form>
+
+      <ItemFailedDialog
+        open={failedManageCode !== null}
+        manageCode={failedManageCode ?? ""}
+        onClose={() => setFailedManageCode(null)}
+      />
 
       <LeaveWarningDialog
         open={leaveDialogOpen}
