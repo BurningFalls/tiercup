@@ -9,7 +9,9 @@ export function buildDirectedGraph(
     graph.set(id, new Set())
   }
   for (const { winner_item_id, loser_item_id } of comparisons) {
-    graph.get(winner_item_id)?.add(loser_item_id)
+    if (winner_item_id !== loser_item_id) {
+      graph.get(winner_item_id)?.add(loser_item_id)
+    }
   }
   return graph
 }
@@ -27,18 +29,13 @@ export function calculateLevels(
     }
   }
 
-  // outDegree: winner→loser 방향에서 각 노드가 이긴 아이템 수
-  // losers가 없는 노드(outDegree=0)부터 BFS 시작 (가장 아래 계층)
-  const outDegree = new Map<string, number>()
-  for (const id of itemIds) outDegree.set(id, (graph.get(id)?.size ?? 0))
-
   const levels = new Map<string, number>()
   for (const id of itemIds) levels.set(id, 0)
 
   // BFS: outDegree=0인 노드 (아무도 못 이긴 노드) 부터 시작
   const queue: string[] = []
   for (const id of itemIds) {
-    if (outDegree.get(id) === 0) queue.push(id)
+    if ((graph.get(id)?.size ?? 0) === 0) queue.push(id)
   }
 
   // 방문 추적: 각 노드는 모든 loser가 처리된 뒤 큐에 진입
@@ -88,18 +85,26 @@ export function assignTiers(
   const compared = [...comparedItemIds].filter((id) => levels.has(id))
   if (compared.length === 0) return result
 
-  // level 내림차순 정렬 (level 높을수록 상위 티어)
-  compared.sort((a, b) => (levels.get(b) ?? 0) - (levels.get(a) ?? 0))
+  // level 내림차순 정렬 (level 높을수록 상위 티어), 동일 level은 id 사전순
+  compared.sort((a, b) => {
+    const diff = (levels.get(b) ?? 0) - (levels.get(a) ?? 0)
+    return diff !== 0 ? diff : a.localeCompare(b)
+  })
 
   const n = compared.length
   // 각 티어별 아이템 수 계산 (최소 1개 보장)
   const counts = TIER_RATIOS.map(({ ratio }) => Math.max(1, Math.round(n * ratio)))
 
-  // 합계가 n을 초과하면 B(index=2)에서 차감
+  // 합계가 n을 초과하면 F부터 역순으로 차감
   let total = counts.reduce((s, c) => s + c, 0)
-  while (total > n && counts[2] > 1) {
-    counts[2]--
-    total--
+  let t = TIER_RATIOS.length - 1
+  while (total > n) {
+    if (counts[t] > 1) {
+      counts[t]--
+      total--
+    } else {
+      t--
+    }
   }
   // 합계가 n 미만이면 B에 추가
   while (total < n) {

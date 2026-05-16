@@ -32,6 +32,16 @@ export const comparisonSchema = z.object({
   loser_item_id: z.string().min(1),
 })
 
+export const topologicalSortSchema = z.object({
+  item_ids: z.array(z.string()).min(1),
+  comparisons: z.array(
+    z.object({
+      winner_item_id: z.string(),
+      loser_item_id: z.string(),
+    }),
+  ),
+})
+
 export const updateResultSchema = z.object({
   results: z.array(
     z.object({
@@ -45,4 +55,5 @@ export const updateResultSchema = z.object({
 export type TierCupFormValues = z.infer<typeof tierCupSchema>
 export type ItemFormValues = z.infer<typeof itemSchema>
 export type ComparisonValues = z.infer<typeof comparisonSchema>
+export type TopologicalSortValues = z.infer<typeof topologicalSortSchema>
 export type UpdateResultValues = z.infer<typeof updateResultSchema>
