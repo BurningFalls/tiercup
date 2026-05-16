@@ -32,7 +32,7 @@ vi.mock('@/lib/supabase/server', () => ({
 import { POST } from './route'
 
 function makeParams(id: string) {
-  return { params: Promise.resolve({ id }) }
+  return { params: Promise.resolve({ playCode: id }) }
 }
 
 // jsdom 환경에서 NextRequest.formData()가 undici File 체크로 실패하므로

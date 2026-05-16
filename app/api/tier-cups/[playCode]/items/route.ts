@@ -7,9 +7,9 @@ const nanoid = customAlphabet('23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrst
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ playCode: string }> },
 ) {
-  const { id } = await params
+  const { playCode: id } = await params
   const tierId = Number(id)
   if (!Number.isInteger(tierId) || tierId <= 0) {
     return NextResponse.json(
