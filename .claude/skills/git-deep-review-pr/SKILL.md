@@ -17,14 +17,14 @@ PR 번호가 없으면 즉시 중단합니다:
 ## 1단계: PR 정보 및 변경 파일 수집
 
 ```bash
-# repo 정보
-gh repo view --json owner,name --jq '"\(.owner.login)/\(.name)"'
+# repo 정보 (이후 단계에서 $REPO 변수로 참조)
+REPO=$(gh repo view --json owner,name --jq '"\(.owner.login)/\(.name)"')
 
 # PR 기본 정보 (headRefOid는 인라인 코멘트에 필요)
 gh pr view <PR번호> --json number,title,headRefName,headRefOid,url
 
 # 변경 파일 목록과 patch
-gh api repos/{owner}/{repo}/pulls/<PR번호>/files \
+gh api repos/$REPO/pulls/<PR번호>/files \
   --jq '.[] | {filename: .filename, patch: .patch}'
 ```
 
@@ -37,13 +37,12 @@ gh api repos/{owner}/{repo}/pulls/<PR번호>/files \
 `/codex:review` 명령을 실행합니다. PR 브랜치의 변경사항을 기준으로 리뷰합니다.
 
 ```
-/codex:review --wait --base main
+/codex:review --base main
 ```
 
-- `--wait`: 포어그라운드에서 실행하여 결과를 바로 받음
 - `--base main`: main 브랜치 대비 현재 브랜치의 변경사항 리뷰
 
-Codex 출력을 보관합니다 (3단계에서 사용).
+Codex 출력을 컨텍스트에 보관합니다 (3단계에서 직접 참조하여 사용).
 
 ---
 
@@ -83,7 +82,7 @@ position 계산이 불확실한 항목은 인라인 코멘트에서 제외하고
 position이 확정된 각 이슈에 대해 gh api로 인라인 코멘트를 작성합니다:
 
 ```bash
-gh api repos/{owner}/{repo}/pulls/<PR번호>/comments \
+gh api repos/$REPO/pulls/<PR번호>/comments \
   -X POST \
   -f body="<심각도이모지> **<제목>**\n\n<문제 설명>\n\n**Codex**: <Codex 의견>\n**검토**: <code-reviewer 동의/반박/보완>" \
   -f path="<파일경로>" \
