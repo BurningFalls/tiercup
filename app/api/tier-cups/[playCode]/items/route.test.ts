@@ -76,7 +76,6 @@ describe('POST /api/tier-cups/[playCode]/items', () => {
     expect(body.error.code).toBe('VALIDATION_ERROR')
   })
 
-
   it('이미지 없이 name만으로 아이템을 생성한다 (201)', async () => {
     mockItemSingle.mockResolvedValue({
       data: { id: 10, name: '케이크', image_url: null },

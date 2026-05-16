@@ -75,6 +75,13 @@ export async function POST(
     )
   }
 
+  if (!cupData) {
+    return NextResponse.json(
+      { error: { code: 'TIER_CUP_NOT_FOUND', message: '티어컵을 찾을 수 없습니다.' } },
+      { status: 404 },
+    )
+  }
+
   const tierId = cupData.id
 
   let finalImageUrl: string | null = null
