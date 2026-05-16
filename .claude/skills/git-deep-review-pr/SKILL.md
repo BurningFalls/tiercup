@@ -28,21 +28,22 @@ gh api repos/$REPO/pulls/<PR번호>/files \
   --jq '.[] | {filename: .filename, patch: .patch}'
 ```
 
-수집한 정보를 이후 단계에서 사용할 수 있도록 보관합니다.
+수집한 정보(특히 `headRefName`, `baseRefName`, `headRefOid`)를 이후 단계에서 참조할 수 있도록 보관합니다.
 
 ---
 
 ## 2단계: Codex 리뷰 실행
 
-`/codex:review` 명령을 실행합니다. PR 브랜치의 변경사항을 기준으로 리뷰합니다.
+1단계에서 수집한 `baseRefName`을 기준으로 Codex 리뷰를 실행합니다.
 
 ```
-/codex:review --base main
+/codex:review --base <baseRefName>
 ```
 
-- `--base main`: main 브랜치 대비 현재 브랜치의 변경사항 리뷰
+- `--base <baseRefName>`: 1단계에서 가져온 PR의 base 브랜치(예: `develop`) 대비 현재 브랜치의 변경사항 리뷰
+- `main` 하드코딩 금지 — PR base 브랜치가 달라질 수 있으므로 반드시 1단계 결과를 사용
 
-Codex 출력을 컨텍스트에 보관합니다 (3단계에서 직접 참조하여 사용).
+Codex 출력(1차 이슈 목록)을 보관합니다 (3단계에서 사용).
 
 ---
 
@@ -107,8 +108,8 @@ gh pr comment <PR번호> --body "<건너뛴 지적사항 목록>"
 
 ```
 ✅ 풀 코드 리뷰 완료
-- Codex 이슈: N개 발견
-- 최종 이슈 (code-reviewer 검토 후): N개
+- Codex 1차 이슈: N개 발견
+- 최종 이슈 (code-reviewer 교차 검토 후): N개
 - 인라인 코멘트: N개
 - 일반 코멘트: N개
 - PR: <PR URL>
