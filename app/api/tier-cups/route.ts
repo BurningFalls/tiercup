@@ -32,12 +32,12 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from('tier_cups')
       .insert({ title: parsed.data, play_code, manage_code })
-      .select('id, play_code, manage_code')
+      .select('play_code, manage_code')
       .single()
 
     if (!error) {
       return NextResponse.json(
-        { id: String(data.id), play_code: data.play_code, manage_code: data.manage_code },
+        { play_code: data.play_code, manage_code: data.manage_code },
         { status: 201 },
       )
     }
