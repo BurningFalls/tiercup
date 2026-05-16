@@ -28,7 +28,7 @@ gh api repos/$REPO/pulls/<PR번호>/files \
   --jq '.[] | {filename: .filename, patch: .patch}'
 ```
 
-수집한 정보를 이후 단계에서 사용할 수 있도록 보관합니다.
+수집한 정보(특히 `headRefName`, `baseRefName`, `headRefOid`)를 이후 단계에서 참조할 수 있도록 보관합니다.
 
 ---
 
