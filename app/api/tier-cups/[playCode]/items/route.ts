@@ -10,7 +10,7 @@ export async function POST(
   { params }: { params: Promise<{ playCode: string }> },
 ) {
   const { playCode } = await params
-  if (!playCode) {
+  if (!/^[a-zA-Z0-9]{6,}$/.test(playCode)) {
     return NextResponse.json(
       { error: { code: 'VALIDATION_ERROR', message: '유효하지 않은 티어컵 코드입니다.' } },
       { status: 400 },
@@ -72,6 +72,13 @@ export async function POST(
         },
       },
       { status: isNotFound ? 404 : 500 },
+    )
+  }
+
+  if (!cupData) {
+    return NextResponse.json(
+      { error: { code: 'TIER_CUP_NOT_FOUND', message: '티어컵을 찾을 수 없습니다.' } },
+      { status: 404 },
     )
   }
 

@@ -38,7 +38,7 @@ function makeParams(id: string) {
 // jsdom 환경에서 NextRequest.formData()가 undici File 체크로 실패하므로
 // request.formData()를 모킹하는 방식으로 테스트
 function makeRequestWithFormData(fields: Record<string, string | { name: string; type: string; size: number }>) {
-  const req = new NextRequest('http://localhost/api/tier-cups/1/items', {
+  const req = new NextRequest('http://localhost/api/tier-cups/JBq6Ud/items', {
     method: 'POST',
   })
 
@@ -67,6 +67,15 @@ beforeEach(() => {
 })
 
 describe('POST /api/tier-cups/[playCode]/items', () => {
+  it('유효하지 않은 playCode 형식이면 400 VALIDATION_ERROR를 반환한다', async () => {
+    const req = makeRequestWithFormData({ name: '아이템', display_order: '0' })
+    const res = await POST(req, makeParams('!!'))
+    const body = await res.json()
+
+    expect(res.status).toBe(400)
+    expect(body.error.code).toBe('VALIDATION_ERROR')
+  })
+
   it('이미지 없이 name만으로 아이템을 생성한다 (201)', async () => {
     mockItemSingle.mockResolvedValue({
       data: { id: 10, name: '케이크', image_url: null },
