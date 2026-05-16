@@ -1,6 +1,6 @@
 ---
-name: deep-review-pr
-description: Codex 리뷰 → code-reviewer 보완 → PR 인라인 코멘트 게시를 한 번에 실행합니다. "/deep-review-pr 1", "PR 딥리뷰 올려줘" 등의 요청에 사용하세요. PR 번호를 인자로 받습니다.
+name: git-deep-review-pr
+description: Codex 리뷰 → code-reviewer 보완 → PR 인라인 코멘트 게시를 한 번에 실행합니다. "/git-deep-review-pr 1", "PR 딥리뷰 올려줘" 등의 요청에 사용하세요. PR 번호를 인자로 받습니다.
 context: fork
 ---
 
@@ -10,7 +10,7 @@ context: fork
 
 PR 번호가 없으면 즉시 중단합니다:
 
-> "PR 번호를 인자로 제공해주세요. 예: `/deep-review-pr 1`"
+> "PR 번호를 인자로 제공해주세요. 예: `/git-deep-review-pr 1`"
 
 ---
 
@@ -114,5 +114,5 @@ gh pr comment <PR번호> --body "<건너뛴 지적사항 목록>"
 - 일반 코멘트: N개
 - PR: <PR URL>
 
-리뷰 코멘트를 코드에 반영하려면 `/code-review-apply <PR번호>`를 사용하세요.
+리뷰 코멘트를 코드에 반영하려면 `/git-code-review-apply <PR번호>`를 사용하세요.
 ```

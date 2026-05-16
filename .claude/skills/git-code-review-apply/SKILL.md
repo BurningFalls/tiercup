@@ -1,6 +1,6 @@
 ---
-name: code-review-apply
-description: GitHub PR의 인라인 리뷰 코멘트를 fetch하여 코드에 자동으로 반영하고 각 코멘트에 reply를 작성합니다. "/code-review-apply 1", "리뷰 반영해줘", "코드 리뷰 반영" 등의 요청에 사용하세요. PR 번호를 인자로 받습니다.
+name: git-code-review-apply
+description: GitHub PR의 인라인 리뷰 코멘트를 fetch하여 코드에 자동으로 반영하고 각 코멘트에 reply를 작성합니다. "/git-code-review-apply 1", "리뷰 반영해줘", "코드 리뷰 반영" 등의 요청에 사용하세요. PR 번호를 인자로 받습니다.
 context: fork
 ---
 
@@ -10,7 +10,7 @@ context: fork
 
 PR 번호가 없으면 즉시 중단하고 안내합니다:
 
-> "PR 번호를 인자로 제공해주세요. 예: `/code-review-apply 1`"
+> "PR 번호를 인자로 제공해주세요. 예: `/git-code-review-apply 1`"
 
 ## 1단계: PR 코멘트 fetch
 

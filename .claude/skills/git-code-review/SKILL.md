@@ -1,6 +1,6 @@
 ---
-name: code-review
-description: 현재 변경사항을 분석하여 심각도별 코드 리뷰를 대화창에 출력합니다. "코드 리뷰해줘", "리뷰해줘", "방금 작성한 코드 리뷰" 등의 요청에 사용하세요. 변경사항이 없으면 안내하고, PR에 올리려면 /code-review-pr을 사용하도록 안내합니다.
+name: git-code-review
+description: 현재 변경사항을 분석하여 심각도별 코드 리뷰를 대화창에 출력합니다. "코드 리뷰해줘", "리뷰해줘", "방금 작성한 코드 리뷰" 등의 요청에 사용하세요. 변경사항이 없으면 안내하고, PR에 올리려면 /git-code-review-pr을 사용하도록 안내합니다.
 context: fork
 ---
 
@@ -59,4 +59,4 @@ git diff HEAD
 
 리뷰 출력 후 사용자에게 안내합니다:
 
-> "리뷰 결과를 GitHub PR 인라인 코멘트로 올리려면 `/code-review-pr <PR번호>`를 사용하세요."
+> "리뷰 결과를 GitHub PR 인라인 코멘트로 올리려면 `/git-code-review-pr <PR번호>`를 사용하세요."
