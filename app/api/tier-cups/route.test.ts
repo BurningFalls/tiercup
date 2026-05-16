@@ -12,25 +12,20 @@ let getQueryResult: { data: unknown; error: unknown; count: number | null } = {
 const mockIlike = vi.fn()
 
 // GET mock chain: select → order → range → thenable (search 없을 때)
-//                select → order → range → ilike → thenable (search 있을 때)
+//                select → order → ilike → range → thenable (search 있을 때)
 const mockRange = vi.fn()
 const mockOrder = vi.fn()
 const mockGetSelect = vi.fn()
 
 function buildGetChain() {
-  // ilike를 호출하면 getQueryResult를 반환하는 Promise
-  mockIlike.mockImplementation(() => Promise.resolve(getQueryResult))
+  // range를 호출하면 thenable 반환 (검색 여부와 무관하게 마지막 단계)
+  mockRange.mockImplementation(() => Promise.resolve(getQueryResult))
 
-  // range를 호출하면 thenable이자 ilike를 가진 객체 반환
-  mockRange.mockImplementation(() => ({
-    then(resolve: (v: unknown) => void, reject?: (e: unknown) => void) {
-      return Promise.resolve(getQueryResult).then(resolve, reject)
-    },
-    ilike: mockIlike,
-  }))
+  // ilike를 호출하면 { range }를 반환
+  mockIlike.mockImplementation(() => ({ range: mockRange }))
 
-  // order → { range }
-  mockOrder.mockImplementation(() => ({ range: mockRange }))
+  // order → { range, ilike } 둘 다 지원
+  mockOrder.mockImplementation(() => ({ range: mockRange, ilike: mockIlike }))
 
   // select → { order }
   mockGetSelect.mockImplementation(() => ({ order: mockOrder }))
