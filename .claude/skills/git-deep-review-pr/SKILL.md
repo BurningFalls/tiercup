@@ -34,12 +34,14 @@ gh api repos/$REPO/pulls/<PR번호>/files \
 
 ## 2단계: Codex 리뷰 실행
 
-1단계에서 수집한 patch를 컨텍스트로 포함하여 Codex 리뷰를 실행합니다.
+1단계에서 수집한 `baseRefName`을 기준으로 Codex 리뷰를 실행합니다.
 
-Codex에 전달할 컨텍스트:
-- PR 변경 파일 목록과 patch 전체 (1단계 결과)
-- 프로젝트 스택: Next.js 15 App Router, TypeScript, TailwindCSS v4, shadcn/ui, Supabase
-- 지시사항: "아래 PR patch를 기반으로 코드 리뷰를 수행하세요. 각 이슈에 파일 경로, 변경 위치, 심각도를 포함하세요."
+```
+/codex:review --base <baseRefName>
+```
+
+- `--base <baseRefName>`: 1단계에서 가져온 PR의 base 브랜치(예: `develop`) 대비 현재 브랜치의 변경사항 리뷰
+- `main` 하드코딩 금지 — PR base 브랜치가 달라질 수 있으므로 반드시 1단계 결과를 사용
 
 Codex 출력(1차 이슈 목록)을 보관합니다 (3단계에서 사용).
 
