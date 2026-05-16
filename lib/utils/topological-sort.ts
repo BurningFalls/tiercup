@@ -98,7 +98,7 @@ export function assignTiers(
   // 합계가 n을 초과하면 F부터 역순으로 차감
   let total = counts.reduce((s, c) => s + c, 0)
   let t = TIER_RATIOS.length - 1
-  while (total > n) {
+  while (total > n && t >= 0) {
     if (counts[t] > 1) {
       counts[t]--
       total--
