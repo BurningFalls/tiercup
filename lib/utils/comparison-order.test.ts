@@ -40,33 +40,31 @@ describe('hasPath', () => {
 })
 
 describe('selectTournamentPair', () => {
-  it('첫 비교 시 임의의 쌍을 반환한다', () => {
-    const pair = selectTournamentPair(['a', 'b', 'c'], [])
-    expect(pair).not.toBeNull()
-    expect(pair).toHaveLength(2)
-    expect(pair![0]).not.toBe(pair![1])
+  it('첫 비교 시 itemIds[0] vs itemIds[1]을 반환한다', () => {
+    const pair = selectTournamentPair(['a', 'b', 'c', 'd'], [])
+    expect(pair).toEqual(['a', 'b'])
   })
 
-  it('이미 비교된 쌍은 반환하지 않는다', () => {
+  it('1라운드 진행 중: 아직 비교 안 한 아이템 쌍을 반환한다', () => {
+    // a vs b 완료 → c, d가 남은 1라운드 후보
     const comparisons = [{ winner_item_id: 'a', loser_item_id: 'b' }]
-    const pair = selectTournamentPair(['a', 'b', 'c'], comparisons)
-    expect(pair).not.toBeNull()
-    const [x, y] = pair!
-    const isDuplicate =
-      (x === 'a' && y === 'b') || (x === 'b' && y === 'a')
-    expect(isDuplicate).toBe(false)
+    const pair = selectTournamentPair(['a', 'b', 'c', 'd'], comparisons)
+    expect(pair).toEqual(['c', 'd'])
+  })
+
+  it('1라운드 완료 후 승자끼리 비교한다', () => {
+    // 1라운드: a vs b → a 승, c vs d → c 승
+    // 2라운드 후보: [a, c]
+    const comparisons = [
+      { winner_item_id: 'a', loser_item_id: 'b' },
+      { winner_item_id: 'c', loser_item_id: 'd' },
+    ]
+    const pair = selectTournamentPair(['a', 'b', 'c', 'd'], comparisons)
+    expect(pair).toEqual(['a', 'c'])
   })
 
   it('n-1번 비교 완료 후 null을 반환한다', () => {
-    // 3개 아이템, 2번 비교 완료
-    const comparisons = [
-      { winner_item_id: 'a', loser_item_id: 'b' },
-      { winner_item_id: 'a', loser_item_id: 'c' },
-    ]
-    expect(selectTournamentPair(['a', 'b', 'c'], comparisons)).toBeNull()
-  })
-
-  it('4개 아이템: 3번 비교 완료 후 null을 반환한다', () => {
+    // 4개 아이템, 3번 비교 완료 (토너먼트 끝)
     const comparisons = [
       { winner_item_id: 'a', loser_item_id: 'b' },
       { winner_item_id: 'c', loser_item_id: 'd' },
