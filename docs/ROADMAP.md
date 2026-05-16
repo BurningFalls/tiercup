@@ -197,8 +197,8 @@
 
 ### Task 018 — 티어컵 목록/탐색 API 구현 (F009, F010)
 
-- [ ] `GET /api/tier-cups` — 목록 조회 (정렬: popular/likes/latest, 페이지네이션, 검색)
-- [ ] `GET /api/tier-cups/:playCode` — 단건 조회
+- [x] `GET /api/tier-cups` — 목록 조회 (정렬: popular/likes/latest, 페이지네이션, 검색)
+- [x] `GET /api/tier-cups/:playCode` — 단건 조회
 
 ### Task 019 — 플레이 세션 및 비교 API 구현 (F002, F004, F005)
 
