@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
   const sortParam = searchParams.get('sort') ?? 'popular'
   const sortColumn = SORT_COLUMNS[sortParam as keyof typeof SORT_COLUMNS] ?? SORT_COLUMNS.popular
   const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10) || 1)
+  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') ?? String(PAGE_SIZE), 10) || PAGE_SIZE))
   const search = searchParams.get('search')?.trim() ?? ''
 
   const supabase = await createClient()
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
     .from('tier_cups')
     .select('id, play_code, title, play_count, like_count, created_at, updated_at', { count: 'exact' })
     .order(sortColumn, { ascending: false })
-    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1)
+    .range((page - 1) * limit, page * limit - 1)
 
   if (search) {
     query = query.ilike('title', `%${search}%`)
