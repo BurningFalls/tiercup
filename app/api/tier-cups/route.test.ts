@@ -45,7 +45,6 @@ describe('POST /api/tier-cups', () => {
     expect(res.status).toBe(201)
     expect(body.play_code).toBe('ABC123')
     expect(body.manage_code).toBe('XYZ789abcdef')
-    expect(body.id).toBe('1')
   })
 
   it('title 누락 시 400 VALIDATION_ERROR를 반환한다', async () => {

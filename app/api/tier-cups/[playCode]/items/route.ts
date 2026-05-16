@@ -7,13 +7,12 @@ const nanoid = customAlphabet('23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrst
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ playCode: string }> },
 ) {
-  const { id } = await params
-  const tierId = Number(id)
-  if (!Number.isInteger(tierId) || tierId <= 0) {
+  const { playCode } = await params
+  if (!/^[a-zA-Z0-9]{6,}$/.test(playCode)) {
     return NextResponse.json(
-      { error: { code: 'VALIDATION_ERROR', message: '유효하지 않은 티어컵 ID입니다.' } },
+      { error: { code: 'VALIDATION_ERROR', message: '유효하지 않은 티어컵 코드입니다.' } },
       { status: 400 },
     )
   }
@@ -57,10 +56,10 @@ export async function POST(
   const supabase = await createClient()
 
   // tier_cup 존재 여부 확인
-  const { error: cupError } = await supabase
+  const { data: cupData, error: cupError } = await supabase
     .from('tier_cups')
     .select('id')
-    .eq('id', tierId)
+    .eq('play_code', playCode)
     .single()
 
   if (cupError) {
@@ -75,6 +74,15 @@ export async function POST(
       { status: isNotFound ? 404 : 500 },
     )
   }
+
+  if (!cupData) {
+    return NextResponse.json(
+      { error: { code: 'TIER_CUP_NOT_FOUND', message: '티어컵을 찾을 수 없습니다.' } },
+      { status: 404 },
+    )
+  }
+
+  const tierId = cupData.id
 
   let finalImageUrl: string | null = null
 
