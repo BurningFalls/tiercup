@@ -6,6 +6,12 @@ export async function GET(
   { params }: { params: Promise<{ playCode: string }> },
 ) {
   const { playCode } = await params
+  if (!/^[a-zA-Z0-9]{6,}$/.test(playCode)) {
+    return NextResponse.json(
+      { error: { code: 'VALIDATION_ERROR', message: '유효하지 않은 티어컵 코드입니다.' } },
+      { status: 400 },
+    )
+  }
 
   const supabase = await createClient()
 

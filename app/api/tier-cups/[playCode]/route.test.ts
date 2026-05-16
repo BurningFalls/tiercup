@@ -27,6 +27,14 @@ beforeEach(() => {
 })
 
 describe('GET /api/tier-cups/[playCode]', () => {
+  it('유효하지 않은 playCode 형식이면 400 VALIDATION_ERROR를 반환한다', async () => {
+    const res = await GET(makeRequest('!!bad'), makeParams('!!bad'))
+    const body = await res.json()
+
+    expect(res.status).toBe(400)
+    expect(body.error.code).toBe('VALIDATION_ERROR')
+  })
+
   const mockTierCup = {
     id: 1,
     play_code: 'abc123',
