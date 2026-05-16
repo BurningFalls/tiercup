@@ -1,6 +1,6 @@
 ---
-name: code-review-apply
-description: GitHub PR의 인라인 리뷰 코멘트를 fetch하여 코드에 자동으로 반영하고 각 코멘트에 reply를 작성합니다. "/code-review-apply 1", "리뷰 반영해줘", "코드 리뷰 반영" 등의 요청에 사용하세요. PR 번호를 인자로 받습니다.
+name: git-code-review-apply
+description: GitHub PR의 인라인 리뷰 코멘트를 fetch하여 코드에 자동으로 반영하고 각 코멘트에 reply를 작성합니다. "/git-code-review-apply 1", "리뷰 반영해줘", "코드 리뷰 반영" 등의 요청에 사용하세요. PR 번호를 인자로 받습니다.
 context: fork
 ---
 
@@ -10,7 +10,7 @@ context: fork
 
 PR 번호가 없으면 즉시 중단하고 안내합니다:
 
-> "PR 번호를 인자로 제공해주세요. 예: `/code-review-apply 1`"
+> "PR 번호를 인자로 제공해주세요. 예: `/git-code-review-apply 1`"
 
 ## 1단계: PR 코멘트 fetch
 
@@ -18,16 +18,22 @@ PR 번호가 없으면 즉시 중단하고 안내합니다:
 # repo 정보 추출
 REPO=$(gh repo view --json owner,name --jq '"\(.owner.login)/\(.name)"')
 
-# 인라인 코멘트 전체 조회 (id, path, body, replies 포함)
+# 인라인 코멘트 전체 조회 (원본 코멘트만, reply 제외)
+# in_reply_to_id가 null인 것만 원본 코멘트
 gh api repos/$REPO/pulls/<PR번호>/comments \
-  --jq '.[] | {id: .id, path: .path, line: .original_line, body: .body, reply_count: (.replies | length // 0)}'
+  --jq '[.[] | select(.in_reply_to_id == null)] | .[] | {id: .id, path: .path, line: .original_line, body: .body}'
+
+# 각 원본 코멘트에 reply가 달렸는지 확인 (이미 처리됐는지 판단)
+# 전체 코멘트에서 in_reply_to_id가 해당 id와 일치하는 것이 있으면 이미 처리된 것
+gh api repos/$REPO/pulls/<PR번호>/comments \
+  --jq '[.[] | select(.in_reply_to_id != null) | .in_reply_to_id] | unique'
 ```
 
 ## 2단계: 코멘트 분석 및 반영 대상 선별
 
 fetch한 코멘트를 분석합니다:
 
-- `reply_count > 0`인 코멘트는 이미 처리된 것으로 간주하고 **제외** (중복 반영 방지)
+- reply가 달린 원본 코멘트(위 두 번째 명령의 id 목록에 포함된 것)는 이미 처리된 것으로 간주하고 **제외** (중복 반영 방지)
 - 남은 코멘트를 파일별로 그룹화
 - 각 코멘트의 지적사항이 무엇인지 파악 (버그 수정, 개선 제안, 스타일 등)
 

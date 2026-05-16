@@ -1,6 +1,6 @@
 ---
-name: code-review-pr
-description: 코드 리뷰 결과를 GitHub PR 인라인 코멘트로 작성합니다. "/code-review-pr 1", "PR에 리뷰 올려줘" 등의 요청에 사용하세요. PR 번호를 인자로 받아 diff position을 계산한 후 gh api로 인라인 코멘트를 작성합니다.
+name: git-code-review-pr
+description: 코드 리뷰 결과를 GitHub PR 인라인 코멘트로 작성합니다. "/git-code-review-pr 1", "PR에 리뷰 올려줘" 등의 요청에 사용하세요. PR 번호를 인자로 받아 diff position을 계산한 후 gh api로 인라인 코멘트를 작성합니다.
 context: fork
 ---
 
@@ -10,7 +10,7 @@ context: fork
 
 PR 번호가 없으면 즉시 중단하고 안내합니다:
 
-> "PR 번호를 인자로 제공해주세요. 예: `/code-review-pr 1`"
+> "PR 번호를 인자로 제공해주세요. 예: `/git-code-review-pr 1`"
 
 ## 1단계: PR 정보 및 변경 파일 확인
 
@@ -78,5 +78,5 @@ gh pr comment <PR번호> --body "<건너뛴 지적사항 목록>"
 - 일반 코멘트: N개
 - PR: <PR URL>
 
-리뷰 코멘트를 코드에 반영하려면 `/code-review-apply <PR번호>`를 사용하세요.
+리뷰 코멘트를 코드에 반영하려면 `/git-code-review-apply <PR번호>`를 사용하세요.
 ```
