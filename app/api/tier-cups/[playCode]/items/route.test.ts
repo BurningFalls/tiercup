@@ -66,7 +66,7 @@ beforeEach(() => {
   mockCupSingle.mockResolvedValue({ data: { id: 1 }, error: null })
 })
 
-describe('POST /api/tier-cups/[id]/items', () => {
+describe('POST /api/tier-cups/[playCode]/items', () => {
   it('이미지 없이 name만으로 아이템을 생성한다 (201)', async () => {
     mockItemSingle.mockResolvedValue({
       data: { id: 10, name: '케이크', image_url: null },
@@ -74,7 +74,7 @@ describe('POST /api/tier-cups/[id]/items', () => {
     })
 
     const req = makeRequestWithFormData({ name: '케이크', display_order: '0' })
-    const res = await POST(req, makeParams('1'))
+    const res = await POST(req, makeParams('JBq6Ud'))
     const body = await res.json()
 
     expect(res.status).toBe(201)
@@ -93,7 +93,7 @@ describe('POST /api/tier-cups/[id]/items', () => {
       display_order: '1',
       image: { name: 'donut.jpg', type: 'image/jpeg', size: 4 },
     })
-    const res = await POST(req, makeParams('1'))
+    const res = await POST(req, makeParams('JBq6Ud'))
     const body = await res.json()
 
     expect(res.status).toBe(201)
@@ -103,7 +103,7 @@ describe('POST /api/tier-cups/[id]/items', () => {
 
   it('name 누락 시 400 VALIDATION_ERROR를 반환한다', async () => {
     const req = makeRequestWithFormData({ display_order: '0' })
-    const res = await POST(req, makeParams('1'))
+    const res = await POST(req, makeParams('JBq6Ud'))
     const body = await res.json()
 
     expect(res.status).toBe(400)
@@ -112,14 +112,14 @@ describe('POST /api/tier-cups/[id]/items', () => {
 
   it('name이 빈 문자열이면 400을 반환한다', async () => {
     const req = makeRequestWithFormData({ name: '', display_order: '0' })
-    const res = await POST(req, makeParams('1'))
+    const res = await POST(req, makeParams('JBq6Ud'))
 
     expect(res.status).toBe(400)
   })
 
   it('name이 50자 초과이면 400을 반환한다', async () => {
     const req = makeRequestWithFormData({ name: 'a'.repeat(51), display_order: '0' })
-    const res = await POST(req, makeParams('1'))
+    const res = await POST(req, makeParams('JBq6Ud'))
 
     expect(res.status).toBe(400)
   })
@@ -130,7 +130,7 @@ describe('POST /api/tier-cups/[id]/items', () => {
       display_order: '0',
       image: { name: 'big.jpg', type: 'image/jpeg', size: 6 * 1024 * 1024 },
     })
-    const res = await POST(req, makeParams('1'))
+    const res = await POST(req, makeParams('JBq6Ud'))
     const body = await res.json()
 
     expect(res.status).toBe(400)
@@ -143,18 +143,18 @@ describe('POST /api/tier-cups/[id]/items', () => {
       display_order: '0',
       image: { name: 'file.pdf', type: 'application/pdf', size: 100 },
     })
-    const res = await POST(req, makeParams('1'))
+    const res = await POST(req, makeParams('JBq6Ud'))
     const body = await res.json()
 
     expect(res.status).toBe(400)
     expect(body.error.code).toBe('VALIDATION_ERROR')
   })
 
-  it('존재하지 않는 tier_cup_id이면 404 TIER_CUP_NOT_FOUND를 반환한다', async () => {
+  it('존재하지 않는 play_code이면 404 TIER_CUP_NOT_FOUND를 반환한다', async () => {
     mockCupSingle.mockResolvedValue({ data: null, error: { code: 'PGRST116', message: 'not found' } })
 
     const req = makeRequestWithFormData({ name: '아이템', display_order: '0' })
-    const res = await POST(req, makeParams('9999'))
+    const res = await POST(req, makeParams('NOTEXIST'))
     const body = await res.json()
 
     expect(res.status).toBe(404)
@@ -165,7 +165,7 @@ describe('POST /api/tier-cups/[id]/items', () => {
     mockCupSingle.mockResolvedValue({ data: null, error: { code: '08006', message: 'connection failure' } })
 
     const req = makeRequestWithFormData({ name: '아이템', display_order: '0' })
-    const res = await POST(req, makeParams('1'))
+    const res = await POST(req, makeParams('JBq6Ud'))
     const body = await res.json()
 
     expect(res.status).toBe(500)
@@ -174,17 +174,10 @@ describe('POST /api/tier-cups/[id]/items', () => {
 
   it('유효하지 않은 image_url이면 400 VALIDATION_ERROR를 반환한다', async () => {
     const req = makeRequestWithFormData({ name: '아이템', display_order: '0', image_url: 'not-a-url' })
-    const res = await POST(req, makeParams('1'))
+    const res = await POST(req, makeParams('JBq6Ud'))
     const body = await res.json()
 
     expect(res.status).toBe(400)
     expect(body.error.code).toBe('VALIDATION_ERROR')
-  })
-
-  it('유효하지 않은 id이면 400을 반환한다', async () => {
-    const req = makeRequestWithFormData({ name: '아이템', display_order: '0' })
-    const res = await POST(req, makeParams('abc'))
-
-    expect(res.status).toBe(400)
   })
 })

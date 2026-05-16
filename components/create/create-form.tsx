@@ -82,7 +82,7 @@ export default function CreateForm() {
       return
     }
 
-    const { id, play_code, manage_code } = await cupRes.json()
+    const { play_code, manage_code } = await cupRes.json()
 
     const results = await Promise.allSettled(
       data.items.map((item, index) => {
@@ -91,7 +91,7 @@ export default function CreateForm() {
         formData.append('display_order', String(index))
         if (item.image) formData.append('image', item.image)
         else if (item.image_url) formData.append('image_url', item.image_url)
-        return fetch(`/api/tier-cups/${id}/items`, { method: 'POST', body: formData })
+        return fetch(`/api/tier-cups/${play_code}/items`, { method: 'POST', body: formData })
       }),
     )
 
