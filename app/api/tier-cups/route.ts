@@ -3,6 +3,44 @@ import { createClient } from '@/lib/supabase/server'
 import { generatePlayCode, generateManageCode } from '@/lib/utils/code'
 import { z } from 'zod'
 
+const PAGE_SIZE = 12
+const SORT_COLUMNS = {
+  popular: 'play_count',
+  likes: 'like_count',
+  latest: 'created_at',
+} as const
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = request.nextUrl
+  const sortParam = searchParams.get('sort') ?? 'popular'
+  const sortColumn = SORT_COLUMNS[sortParam as keyof typeof SORT_COLUMNS] ?? SORT_COLUMNS.popular
+  const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10) || 1)
+  const search = searchParams.get('search')?.trim() ?? ''
+
+  const supabase = await createClient()
+
+  let query = supabase
+    .from('tier_cups')
+    .select('id, play_code, title, play_count, like_count, created_at, updated_at', { count: 'exact' })
+    .order(sortColumn, { ascending: false })
+    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1)
+
+  if (search) {
+    query = query.ilike('title', `%${search}%`)
+  }
+
+  const { data, error, count } = await query
+
+  if (error) {
+    return NextResponse.json(
+      { error: { code: 'INTERNAL_ERROR', message: '목록 조회에 실패했습니다.' } },
+      { status: 500 },
+    )
+  }
+
+  return NextResponse.json({ data: data ?? [], total: count ?? 0, page })
+}
+
 export async function POST(request: NextRequest) {
   let body: unknown
   try {
