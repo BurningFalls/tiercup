@@ -35,10 +35,11 @@ describe('hasPath', () => {
 })
 
 describe('selectNextPair', () => {
-  it('비교가 없으면 첫 두 아이템을 반환한다', () => {
+  it('비교가 없으면 임의의 두 아이템으로 구성된 쌍을 반환한다', () => {
     const pair = selectNextPair(['a', 'b', 'c'], [])
     expect(pair).not.toBeNull()
     expect(pair).toHaveLength(2)
+    expect(pair![0]).not.toBe(pair![1])
   })
 
   it('반환된 쌍의 두 아이템은 itemIds에 속한다', () => {

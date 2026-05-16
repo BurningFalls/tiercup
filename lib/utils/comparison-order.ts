@@ -34,14 +34,20 @@ export function selectNextPair(
   const matchCount = new Map<string, number>()
   for (const id of itemIds) matchCount.set(id, 0)
   for (const { winner_item_id, loser_item_id } of comparisons) {
-    matchCount.set(winner_item_id, (matchCount.get(winner_item_id) ?? 0) + 1)
-    matchCount.set(loser_item_id, (matchCount.get(loser_item_id) ?? 0) + 1)
+    if (matchCount.has(winner_item_id))
+      matchCount.set(winner_item_id, matchCount.get(winner_item_id)! + 1)
+    if (matchCount.has(loser_item_id))
+      matchCount.set(loser_item_id, matchCount.get(loser_item_id)! + 1)
   }
 
+  // 동일 matchCount일 때 id 사전순 2차 정렬로 결정적 순서 보장
   const sorted = [...itemIds].sort(
-    (a, b) => (matchCount.get(a) ?? 0) - (matchCount.get(b) ?? 0),
+    (a, b) =>
+      (matchCount.get(a) ?? 0) - (matchCount.get(b) ?? 0) ||
+      a.localeCompare(b),
   )
 
+  // O(n²·(V+E)): 아이템 수가 적은 티어컵 사용 케이스(n ≤ 64)에서 허용 범위
   for (let i = 0; i < sorted.length; i++) {
     for (let j = i + 1; j < sorted.length; j++) {
       const a = sorted[i]
