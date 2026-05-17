@@ -237,11 +237,11 @@ items
 {
   "title": "디저트 월드컵",
   "items": [
-    { "id": 1, "name": "케이크", "image_url": "https://..." },
-    { "id": 2, "name": "컵케이크", "image_url": "https://..." },
-    { "id": 3, "name": "도넛", "image_url": "https://..." },
-    { "id": 4, "name": "아이스크림", "image_url": "https://..." },
-    { "id": 5, "name": "쿠키", "image_url": "https://..." }
+    { "id": "1", "name": "케이크", "image_url": "https://..." },
+    { "id": "2", "name": "컵케이크", "image_url": "https://..." },
+    { "id": "3", "name": "도넛", "image_url": "https://..." },
+    { "id": "4", "name": "아이스크림", "image_url": "https://..." },
+    { "id": "5", "name": "쿠키", "image_url": "https://..." }
   ]
 }
 ```
@@ -268,7 +268,7 @@ items
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
-| id | number | 아이템 ID |
+| id | string | 아이템 ID |
 | name | string | 아이템 이름 |
 | image_url | string | 이미지 URL |
 
@@ -294,9 +294,9 @@ GET /api/tier-cups/manage/Kp3mQ2xL9vRt
 {
   "title": "디저트 월드컵 v2",
   "items": [
-    { "id": 1, "name": "케이크", "image_url": "https://..." },
-    { "id": 2, "name": "컵케이크 수정", "image_url": "https://..." },
-    { "id": 3, "name": "도넛", "image_url": "https://..." },
+    { "id": "1", "name": "케이크", "image_url": "https://..." },
+    { "id": "2", "name": "컵케이크 수정", "image_url": "https://..." },
+    { "id": "3", "name": "도넛", "image_url": "https://..." },
     { "name": "새 아이템", "image_url": "https://..." }
   ]
 }
@@ -313,7 +313,7 @@ items
 
 | 필드 | 타입 | 필수 | 설명 |
 |------|------|------|------|
-| id | number | X | 기존 아이템 ID (없으면 새 아이템) |
+| id | string | X | 기존 아이템 ID (없으면 새 아이템) |
 | name | string | O | 아이템 이름 |
 | image_url | string | O | 이미지 URL |
 
@@ -405,36 +405,50 @@ DELETE /api/tier-cups/manage/Kp3mQ2xL9vRt
 
 ---
 
-## 플레이
+## 플레이 세션
 
-### POST /api/play/:playCode/start — 플레이 시작
+### POST /api/play-sessions — 세션 생성
 
-**Path Parameters**
+**Request Body**
 
-| 파라미터 | 타입 | 필수 | 설명 |
-|----------|------|------|------|
-| playCode | string | O | 티어컵 플레이 코드 |
+```json
+{
+  "play_code": "dF7kx9"
+}
+```
+
+**Request 필드 설명**
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| play_code | string | O | 티어컵 플레이 코드 |
 
 **Response 성공 (201)**
 
 ```json
 {
-  "session_id": 12345,
   "result_code": "xY9kL2",
   "title": "디저트 월드컵",
   "items": [
-    { "id": 1, "name": "케이크", "image_url": "https://..." },
-    { "id": 2, "name": "도넛", "image_url": "https://..." },
-    { "id": 3, "name": "아이스크림", "image_url": "https://..." },
-    { "id": 4, "name": "마카롱", "image_url": "https://..." },
-    { "id": 5, "name": "쿠키", "image_url": "https://..." },
-    { "id": 6, "name": "푸딩", "image_url": "https://..." },
-    { "id": 7, "name": "초콜릿", "image_url": "https://..." },
-    { "id": 8, "name": "젤리", "image_url": "https://..." }
+    { "id": "1", "name": "케이크", "image_url": "https://..." },
+    { "id": "2", "name": "도넛", "image_url": "https://..." },
+    { "id": "3", "name": "아이스크림", "image_url": "https://..." },
+    { "id": "4", "name": "마카롱", "image_url": "https://..." }
   ],
-  "first_match": {
-    "item_a": { "id": 1, "name": "케이크", "image_url": "https://..." },
-    "item_b": { "id": 2, "name": "도넛", "image_url": "https://..." }
+  "first_pair": {
+    "item_a": { "id": "1", "name": "케이크", "image_url": "https://..." },
+    "item_b": { "id": "2", "name": "도넛", "image_url": "https://..." }
+  }
+}
+```
+
+**Response 실패 (400)**
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "play_code가 필요합니다."
   }
 }
 ```
@@ -454,21 +468,20 @@ DELETE /api/tier-cups/manage/Kp3mQ2xL9vRt
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
-| session_id | number | 플레이 세션 ID (비교 결과 제출 시 사용) |
-| result_code | string | 결과 페이지용 코드 |
+| result_code | string | 결과 페이지용 코드 (이후 API 경로에 사용) |
 | title | string | 티어컵 제목 |
 | items | array | 전체 아이템 목록 |
-| first_match | object | 첫 번째 비교 쌍 |
+| first_pair | object / null | 첫 번째 비교 쌍 (아이템이 부족하면 null) |
 
 items
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
-| id | number | 아이템 ID |
+| id | string | 아이템 ID |
 | name | string | 아이템 이름 |
-| image_url | string | 이미지 URL |
+| image_url | string / null | 이미지 URL |
 
-first_match
+first_pair
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
@@ -478,69 +491,37 @@ first_match
 **사용 예시**
 
 ```
-POST /api/play/dF7kx9/start
+POST /api/play-sessions
 ```
 
 ---
 
-### POST /api/play/:sessionId/compare — 비교 결과 제출
+### GET /api/play-sessions/:resultCode/next-pair — 다음 비교 쌍 조회
 
 **Path Parameters**
 
 | 파라미터 | 타입 | 필수 | 설명 |
 |----------|------|------|------|
-| sessionId | number | O | 플레이 세션 ID |
+| resultCode | string | O | 세션 결과 코드 |
 
-**Request Body**
-
-```json
-{
-  "winner_item_id": 1,
-  "loser_item_id": 2
-}
-```
-
-**Request 필드 설명**
-
-| 필드 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| winner_item_id | number | O | 이긴 아이템 ID |
-| loser_item_id | number | O | 진 아이템 ID |
-
-**Response 성공 (200)**
+**Response 성공 (200) — 다음 쌍 있음**
 
 ```json
 {
-  "comparison_count": 5,
-  "current_tiers": [
-    { "tier": "S", "items": [{ "id": 1, "name": "케이크", "image_url": "https://..." }] },
-    { "tier": "A", "items": [{ "id": 3, "name": "아이스크림", "image_url": "https://..." }] },
-    { "tier": "B", "items": [
-      { "id": 2, "name": "도넛", "image_url": "https://..." },
-      { "id": 4, "name": "마카롱", "image_url": "https://..." }
-    ]},
-    { "tier": "C", "items": [{ "id": 5, "name": "쿠키", "image_url": "https://..." }] },
-    { "tier": "D", "items": [{ "id": 6, "name": "푸딩", "image_url": "https://..." }] },
-    { "tier": "F", "items": [
-      { "id": 7, "name": "초콜릿", "image_url": "https://..." },
-      { "id": 8, "name": "젤리", "image_url": "https://..." }
-    ]}
-  ],
-  "next_match": {
-    "item_a": { "id": 3, "name": "아이스크림", "image_url": "https://..." },
-    "item_b": { "id": 4, "name": "마카롱", "image_url": "https://..." }
-  },
+  "item_a": { "id": "3", "name": "아이스크림", "image_url": "https://..." },
+  "item_b": { "id": "4", "name": "마카롱", "image_url": "https://..." },
+  "comparison_count": 3,
   "is_complete": false
 }
 ```
 
-**Response 성공 - 플레이 완료 (200)**
+**Response 성공 (200) — 플레이 완료**
 
 ```json
 {
+  "item_a": null,
+  "item_b": null,
   "comparison_count": 10,
-  "current_tiers": [...],
-  "next_match": null,
   "is_complete": true
 }
 ```
@@ -560,66 +541,89 @@ POST /api/play/dF7kx9/start
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
+| item_a | object / null | 비교 아이템 A (완료 시 null) |
+| item_b | object / null | 비교 아이템 B (완료 시 null) |
 | comparison_count | number | 현재까지 비교 횟수 |
-| current_tiers | array | 현재 티어 배치 상태 |
-| next_match | object / null | 다음 비교 쌍 (완료 시 null) |
 | is_complete | boolean | 플레이 완료 여부 |
-
-current_tiers
-
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| tier | string | 티어 (S, A, B, C, D, F) |
-| items | array | 해당 티어의 아이템 목록 |
-
-next_match
-
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| item_a | object | 비교 아이템 A |
-| item_b | object | 비교 아이템 B |
 
 **사용 예시**
 
 ```
-POST /api/play/12345/compare
+GET /api/play-sessions/xY9kL2/next-pair
 ```
 
 ---
 
-### GET /api/play/:sessionId/status — 플레이 상태 조회
+### POST /api/play-sessions/:resultCode/comparisons — 비교 결과 저장
 
 **Path Parameters**
 
 | 파라미터 | 타입 | 필수 | 설명 |
 |----------|------|------|------|
-| sessionId | number | O | 플레이 세션 ID |
+| resultCode | string | O | 세션 결과 코드 |
 
-**Response 성공 (200)**
+**Request Body**
 
 ```json
 {
-  "title": "디저트 월드컵",
+  "winner_item_id": "1",
+  "loser_item_id": "2"
+}
+```
+
+**Request 필드 설명**
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| winner_item_id | string | O | 이긴 아이템 ID |
+| loser_item_id | string | O | 진 아이템 ID |
+
+**Response 성공 (201)**
+
+```json
+{
   "comparison_count": 5,
   "current_tiers": [
-    { "tier": "S", "items": [{ "id": 1, "name": "케이크", "image_url": "https://..." }] },
-    { "tier": "A", "items": [{ "id": 3, "name": "아이스크림", "image_url": "https://..." }] },
+    { "tier": "S", "items": [{ "id": "1", "name": "케이크", "image_url": "https://..." }] },
+    { "tier": "A", "items": [{ "id": "3", "name": "아이스크림", "image_url": "https://..." }] },
     { "tier": "B", "items": [
-      { "id": 2, "name": "도넛", "image_url": "https://..." },
-      { "id": 4, "name": "마카롱", "image_url": "https://..." }
+      { "id": "2", "name": "도넛", "image_url": "https://..." },
+      { "id": "4", "name": "마카롱", "image_url": "https://..." }
     ]},
-    { "tier": "C", "items": [{ "id": 5, "name": "쿠키", "image_url": "https://..." }] },
-    { "tier": "D", "items": [{ "id": 6, "name": "푸딩", "image_url": "https://..." }] },
+    { "tier": "C", "items": [{ "id": "5", "name": "쿠키", "image_url": "https://..." }] },
+    { "tier": "D", "items": [{ "id": "6", "name": "푸딩", "image_url": "https://..." }] },
     { "tier": "F", "items": [
-      { "id": 7, "name": "초콜릿", "image_url": "https://..." },
-      { "id": 8, "name": "젤리", "image_url": "https://..." }
+      { "id": "7", "name": "초콜릿", "image_url": "https://..." },
+      { "id": "8", "name": "젤리", "image_url": "https://..." }
     ]}
   ],
-  "next_match": {
-    "item_a": { "id": 3, "name": "아이스크림", "image_url": "https://..." },
-    "item_b": { "id": 4, "name": "마카롱", "image_url": "https://..." }
+  "next_pair": {
+    "item_a": { "id": "3", "name": "아이스크림", "image_url": "https://..." },
+    "item_b": { "id": "4", "name": "마카롱", "image_url": "https://..." }
   },
   "is_complete": false
+}
+```
+
+**Response 성공 (201) — 플레이 완료**
+
+```json
+{
+  "comparison_count": 10,
+  "current_tiers": [...],
+  "next_pair": null,
+  "is_complete": true
+}
+```
+
+**Response 실패 (400)**
+
+```json
+{
+  "error": {
+    "code": "SESSION_ALREADY_COMPLETED",
+    "message": "이미 완료된 세션입니다."
+  }
 }
 ```
 
@@ -638,20 +642,19 @@ POST /api/play/12345/compare
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
-| title | string | 티어컵 제목 |
 | comparison_count | number | 현재까지 비교 횟수 |
 | current_tiers | array | 현재 티어 배치 상태 |
-| next_match | object / null | 다음 비교 쌍 (완료 시 null) |
+| next_pair | object / null | 다음 비교 쌍 (완료 시 null) |
 | is_complete | boolean | 플레이 완료 여부 |
 
 current_tiers
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
-| tier | string | 티어 (S, A, B, C, D, F) |
+| tier | string | 티어 (S, A, B, C, D, F, ?) |
 | items | array | 해당 티어의 아이템 목록 |
 
-next_match
+next_pair
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
@@ -661,18 +664,18 @@ next_match
 **사용 예시**
 
 ```
-GET /api/play/12345/status
+POST /api/play-sessions/xY9kL2/comparisons
 ```
 
 ---
 
-### POST /api/play/:sessionId/complete — 플레이 완료 (조기 종료)
+### POST /api/play-sessions/:resultCode/complete — 세션 완료 처리
 
 **Path Parameters**
 
 | 파라미터 | 타입 | 필수 | 설명 |
 |----------|------|------|------|
-| sessionId | number | O | 플레이 세션 ID |
+| resultCode | string | O | 세션 결과 코드 |
 
 **Response 성공 (200)**
 
@@ -702,7 +705,7 @@ GET /api/play/12345/status
 **사용 예시**
 
 ```
-POST /api/play/12345/complete
+POST /api/play-sessions/xY9kL2/complete
 ```
 
 ---
@@ -856,17 +859,17 @@ DELETE /api/tier-cups/dF7kx9/like
   "play_code": "dF7kx9",
   "title": "디저트 월드컵",
   "tiers": [
-    { "tier": "S", "items": [{ "id": 1, "name": "케이크", "image_url": "https://..." }] },
-    { "tier": "A", "items": [{ "id": 3, "name": "아이스크림", "image_url": "https://..." }] },
+    { "tier": "S", "items": [{ "id": "1", "name": "케이크", "image_url": "https://..." }] },
+    { "tier": "A", "items": [{ "id": "3", "name": "아이스크림", "image_url": "https://..." }] },
     { "tier": "B", "items": [
-      { "id": 2, "name": "도넛", "image_url": "https://..." },
-      { "id": 4, "name": "마카롱", "image_url": "https://..." }
+      { "id": "2", "name": "도넛", "image_url": "https://..." },
+      { "id": "4", "name": "마카롱", "image_url": "https://..." }
     ]},
-    { "tier": "C", "items": [{ "id": 5, "name": "쿠키", "image_url": "https://..." }] },
-    { "tier": "D", "items": [{ "id": 6, "name": "푸딩", "image_url": "https://..." }] },
+    { "tier": "C", "items": [{ "id": "5", "name": "쿠키", "image_url": "https://..." }] },
+    { "tier": "D", "items": [{ "id": "6", "name": "푸딩", "image_url": "https://..." }] },
     { "tier": "F", "items": [
-      { "id": 7, "name": "초콜릿", "image_url": "https://..." },
-      { "id": 8, "name": "젤리", "image_url": "https://..." }
+      { "id": "7", "name": "초콜릿", "image_url": "https://..." },
+      { "id": "8", "name": "젤리", "image_url": "https://..." }
     ]}
   ],
   "comparison_count": 10
@@ -1004,7 +1007,7 @@ PUT /api/results/xY9kL2
   },
   "item_stats": [
     {
-      "id": 1,
+      "id": "1",
       "name": "케이크",
       "image_url": "https://...",
       "tier_distribution": {
@@ -1017,7 +1020,7 @@ PUT /api/results/xY9kL2
       }
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "도넛",
       "image_url": "https://...",
       "tier_distribution": {
@@ -1031,11 +1034,11 @@ PUT /api/results/xY9kL2
     }
   ],
   "fun_stats": {
-    "most_s_tier": { "id": 1, "name": "케이크", "rate": 42 },
-    "most_f_tier": { "id": 8, "name": "젤리", "rate": 38 },
+    "most_s_tier": { "id": "1", "name": "케이크", "rate": 42 },
+    "most_f_tier": { "id": "8", "name": "젤리", "rate": 38 },
     "closest_match": {
-      "item_a": { "id": 1, "name": "케이크" },
-      "item_b": { "id": 2, "name": "도넛" },
+      "item_a": { "id": "1", "name": "케이크" },
+      "item_b": { "id": "2", "name": "도넛" },
       "win_rate": 51.2
     }
   }
