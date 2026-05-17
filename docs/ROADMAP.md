@@ -202,10 +202,10 @@
 
 ### Task 019 — 플레이 세션 및 비교 API 구현 (F002, F004, F005)
 
-- [ ] `POST /api/play-sessions` — 세션 생성 (result_code 발급)
-- [ ] `GET /api/play-sessions/:resultCode/next-pair` — 다음 비교 쌍 반환
-- [ ] `POST /api/play-sessions/:resultCode/comparisons` — 비교 결과 저장 + 위상정렬 재계산
-- [ ] `POST /api/play-sessions/:resultCode/complete` — 조기 종료 또는 완료 처리
+- [x] `POST /api/play-sessions` — 세션 생성 (result_code 발급)
+- [x] `GET /api/play-sessions/:resultCode/next-pair` — 다음 비교 쌍 반환
+- [x] `POST /api/play-sessions/:resultCode/comparisons` — 비교 결과 저장 + 위상정렬 재계산
+- [x] `POST /api/play-sessions/:resultCode/complete` — 조기 종료 또는 완료 처리
 
 ### Task 020 — 결과 조회 및 공유 API 구현 (F006, F008)
 
