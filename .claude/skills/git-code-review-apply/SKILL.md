@@ -18,22 +18,29 @@ PR 번호가 없으면 즉시 중단하고 안내합니다:
 # repo 정보 추출
 REPO=$(gh repo view --json owner,name --jq '"\(.owner.login)/\(.name)"')
 
-# 인라인 코멘트 전체 조회 (원본 코멘트만, reply 제외)
+# [A] 인라인 코멘트 전체 조회 (원본 코멘트만, reply 제외)
 # in_reply_to_id가 null인 것만 원본 코멘트
 gh api repos/$REPO/pulls/<PR번호>/comments \
   --jq '[.[] | select(.in_reply_to_id == null)] | .[] | {id: .id, path: .path, line: .original_line, body: .body}'
 
-# 각 원본 코멘트에 reply가 달렸는지 확인 (이미 처리됐는지 판단)
-# 전체 코멘트에서 in_reply_to_id가 해당 id와 일치하는 것이 있으면 이미 처리된 것
+# 각 원본 인라인 코멘트에 reply가 달렸는지 확인 (이미 처리됐는지 판단)
 gh api repos/$REPO/pulls/<PR번호>/comments \
   --jq '[.[] | select(.in_reply_to_id != null) | .in_reply_to_id] | unique'
+
+# [B] PR 일반 코멘트 전체 조회 (인라인이 아닌 PR 레벨 코멘트)
+# position을 특정할 수 없어 인라인으로 달리지 않은 리뷰 항목이 여기에 포함될 수 있음
+gh api repos/$REPO/issues/<PR번호>/comments \
+  --jq '.[] | {id: .id, body: .body, created_at: .created_at, user: .user.login}'
 ```
+
+**중요**: 인라인 코멘트([A])와 일반 코멘트([B]) 모두 반영 대상입니다. 일반 코멘트에는 position 계산이 불확실해 인라인으로 달지 못한 리뷰 항목이 포함되어 있을 수 있으므로 반드시 확인해야 합니다.
 
 ## 2단계: 코멘트 분석 및 반영 대상 선별
 
 fetch한 코멘트를 분석합니다:
 
-- reply가 달린 원본 코멘트(위 두 번째 명령의 id 목록에 포함된 것)는 이미 처리된 것으로 간주하고 **제외** (중복 반영 방지)
+- **인라인 코멘트**: reply가 달린 원본 코멘트는 이미 처리된 것으로 간주하고 **제외** (중복 반영 방지)
+- **일반 코멘트**: 리뷰어가 작성한 코멘트 중 코드 수정이 필요한 지적사항을 추출. 이미 반영 완료 코멘트(예: "반영했습니다"가 포함된 것)는 **제외**
 - 남은 코멘트를 파일별로 그룹화
 - 각 코멘트의 지적사항이 무엇인지 파악 (버그 수정, 개선 제안, 스타일 등)
 
@@ -59,19 +66,26 @@ npm run lint && npm run build
 
 ## 4단계: GitHub reply 작성
 
-반영한 코멘트마다 reply를 작성합니다:
+**인라인 코멘트** — 반영 여부에 관계없이 모든 원본 코멘트에 reply를 작성합니다:
 
 ```bash
+# 반영한 경우
 gh api repos/$REPO/pulls/<PR번호>/comments/<코멘트id>/replies \
   -X POST \
   -f body="반영했습니다. <구체적으로 무엇을 바꿨는지 한 줄>"
-```
 
-반영하지 않은 코멘트(이미 처리됨, 반영 불가 등):
-```bash
+# 반영하지 않은 경우 (이미 처리됨, 반영 불가 등)
 gh api repos/$REPO/pulls/<PR번호>/comments/<코멘트id>/replies \
   -X POST \
   -f body="<반영하지 않은 이유 한 줄>"
+```
+
+**일반 코멘트** — 반영한 항목이 있으면 해당 코멘트에 답글을 작성합니다:
+
+```bash
+gh api repos/$REPO/issues/<PR번호>/comments \
+  -X POST \
+  -f body="## 반영 완료 (commit \`<커밋해시>\`)\n\n<반영한 항목 목록>\n\n<반영하지 않은 항목이 있으면 이유와 함께 명시>"
 ```
 
 ## 5단계: 완료 보고
