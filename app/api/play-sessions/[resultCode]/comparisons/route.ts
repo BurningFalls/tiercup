@@ -95,20 +95,8 @@ export async function POST(
     )
   }
 
-  // 비교 결과 저장
-  const { error: insertError } = await supabase
-    .from('comparisons')
-    .insert({ play_session_id: session.id, winner_item_id, loser_item_id })
-
-  if (insertError) {
-    return NextResponse.json(
-      { error: { code: 'INTERNAL_ERROR', message: '비교 결과 저장에 실패했습니다.' } },
-      { status: 500 },
-    )
-  }
-
-  // 전체 비교 목록 조회 (방금 INSERT한 것 포함)
-  const { data: allComparisons, error: comparisonsError } = await supabase
+  // 기존 비교 목록 조회 (다음 쌍 결정 및 티어 계산용)
+  const { data: existingComparisons, error: comparisonsError } = await supabase
     .from('comparisons')
     .select('winner_item_id, loser_item_id')
     .eq('play_session_id', session.id)
@@ -120,10 +108,14 @@ export async function POST(
     )
   }
 
-  const comparisonList = (allComparisons ?? []).map((c) => ({
-    winner_item_id: String(c.winner_item_id),
-    loser_item_id: String(c.loser_item_id),
-  }))
+  // 방금 비교한 결과 포함해서 티어 계산
+  const comparisonList = [
+    ...(existingComparisons ?? []).map((c) => ({
+      winner_item_id: String(c.winner_item_id),
+      loser_item_id: String(c.loser_item_id),
+    })),
+    { winner_item_id, loser_item_id },
+  ]
 
   // 위상정렬로 현재 티어 계산
   const graph = buildDirectedGraph(itemIds, comparisonList)
@@ -135,44 +127,31 @@ export async function POST(
   }
   const tierMap = assignTiers(levels, comparedItemIds)
 
-  // play_results upsert
-  const upsertRows = itemIds.map((id, idx) => ({
-    play_session_id: session.id,
+  // 다음 비교 쌍 결정
+  const nextPairIds = selectNextPair(itemIds, comparisonList)
+  const isComplete = nextPairIds === null
+
+  // comparisons INSERT + play_results UPSERT + comparison_count increment를 단일 트랜잭션으로 처리
+  const resultRows = itemIds.map((id, idx) => ({
     item_id: id,
     tier: (tierMap[id] ?? '?') as Tier,
     tier_order: idx,
   }))
 
-  const { error: upsertError } = await supabase
-    .from('play_results')
-    .upsert(upsertRows, { onConflict: 'play_session_id,item_id' })
-
-  if (upsertError) {
-    return NextResponse.json(
-      { error: { code: 'INTERNAL_ERROR', message: '결과 저장에 실패했습니다.' } },
-      { status: 500 },
-    )
-  }
-
-  // 다음 비교 쌍 결정
-  const nextPairIds = selectNextPair(itemIds, comparisonList)
-  const isComplete = nextPairIds === null
-
-  // 세션 comparison_count atomic increment (race condition 방지)
-  // 완료 시 status/completed_at도 함께 갱신
-  const { error: sessionUpdateError } = await supabase.rpc('increment_comparison_count', {
+  const { data: newComparisonCount, error: saveError } = await supabase.rpc('save_comparison', {
     p_session_id: session.id,
+    p_winner_item_id: Number(winner_item_id),
+    p_loser_item_id: Number(loser_item_id),
+    p_result_rows: resultRows,
     p_is_complete: isComplete,
   })
 
-  if (sessionUpdateError) {
+  if (saveError) {
     return NextResponse.json(
-      { error: { code: 'INTERNAL_ERROR', message: '세션 업데이트에 실패했습니다.' } },
+      { error: { code: 'INTERNAL_ERROR', message: '비교 결과 저장에 실패했습니다.' } },
       { status: 500 },
     )
   }
-
-  const newComparisonCount = session.comparison_count + 1
 
   // current_tiers 조립 (S→A→B→C→D→F→? 순)
   const TIER_ORDER: Tier[] = ['S', 'A', 'B', 'C', 'D', 'F', '?']

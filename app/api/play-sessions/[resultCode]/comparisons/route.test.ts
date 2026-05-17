@@ -25,27 +25,18 @@ const mockItemsResult = vi.fn()
 const mockItemsEq = vi.fn(() => mockItemsResult())
 const mockItemsSelect = vi.fn(() => ({ eq: mockItemsEq }))
 
-// comparisons insert: insert (no select)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockComparisonsInsert = vi.fn(() => Promise.resolve({ error: null as any }))
+// comparisons: select → eq (기존 비교 목록 조회)
+const mockComparisonsResult = vi.fn()
+const mockComparisonsEq = vi.fn(() => mockComparisonsResult())
+const mockComparisonsSelect = vi.fn(() => ({ eq: mockComparisonsEq }))
 
-// comparisons select → eq
-const mockComparisonsSelectResult = vi.fn()
-const mockComparisonsSelectEq = vi.fn(() => mockComparisonsSelectResult())
-const mockComparisonsSelect = vi.fn(() => ({ eq: mockComparisonsSelectEq }))
-
-// play_results upsert
-const mockUpsert = vi.fn(() => Promise.resolve({ error: null }))
-
-// rpc (increment_comparison_count)
-const mockRpc = vi.fn(() => Promise.resolve({ error: null }))
+// rpc (save_comparison)
+const mockRpc = vi.fn()
 
 const mockFrom = vi.fn((table: string) => {
   if (table === 'play_sessions') return { select: mockSessionSelect }
   if (table === 'items') return { select: mockItemsSelect }
-  if (table === 'comparisons')
-    return { insert: mockComparisonsInsert, select: mockComparisonsSelect }
-  if (table === 'play_results') return { upsert: mockUpsert }
+  if (table === 'comparisons') return { select: mockComparisonsSelect }
   return {}
 })
 
@@ -86,13 +77,11 @@ beforeEach(() => {
   vi.clearAllMocks()
   mockSessionSingle.mockResolvedValue({ data: mockSession, error: null })
   mockItemsResult.mockResolvedValue({ data: mockItems, error: null })
-  mockComparisonsInsert.mockResolvedValue({ error: null })
-  mockComparisonsSelectResult.mockResolvedValue({
+  mockComparisonsResult.mockResolvedValue({
     data: [{ winner_item_id: 1, loser_item_id: 2 }],
     error: null,
   })
-  mockUpsert.mockResolvedValue({ error: null })
-  mockRpc.mockResolvedValue({ error: null })
+  mockRpc.mockResolvedValue({ data: 3, error: null })
 })
 
 describe('POST /api/play-sessions/:resultCode/comparisons', () => {
@@ -108,6 +97,11 @@ describe('POST /api/play-sessions/:resultCode/comparisons', () => {
     expect(body.current_tiers).toBeInstanceOf(Array)
     expect(body.next_pair.item_a.id).toBe('3')
     expect(body.is_complete).toBe(false)
+    expect(mockRpc).toHaveBeenCalledWith('save_comparison', expect.objectContaining({
+      p_winner_item_id: 1,
+      p_loser_item_id: 2,
+      p_is_complete: false,
+    }))
   })
 
   it('잘못된 JSON body이면 400을 반환한다', async () => {
@@ -182,24 +176,13 @@ describe('POST /api/play-sessions/:resultCode/comparisons', () => {
     expect(res.status).toBe(201)
     expect(body.is_complete).toBe(true)
     expect(body.next_pair).toBeNull()
+    expect(mockRpc).toHaveBeenCalledWith('save_comparison', expect.objectContaining({
+      p_is_complete: true,
+    }))
   })
 
-  it('comparisons INSERT 실패 시 500을 반환한다', async () => {
-    mockComparisonsInsert.mockResolvedValue({ error: { code: '99999', message: 'fail' } })
-
-    const res = await POST(
-      makeRequest('RESULT1', { winner_item_id: '1', loser_item_id: '2' }),
-      makeParams('RESULT1'),
-    )
-    const body = await res.json()
-
-    expect(res.status).toBe(500)
-    expect(body.error.code).toBe('INTERNAL_ERROR')
-  })
-
-  it('세션 업데이트(rpc) 실패 시 500을 반환한다', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mockRpc.mockResolvedValue({ error: { code: '99999', message: 'fail' } as any })
+  it('save_comparison RPC 실패 시 500을 반환한다', async () => {
+    mockRpc.mockResolvedValue({ data: null, error: { code: '99999', message: 'fail' } })
 
     const res = await POST(
       makeRequest('RESULT1', { winner_item_id: '1', loser_item_id: '2' }),
