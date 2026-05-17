@@ -47,7 +47,7 @@ vi.mock('@/lib/supabase/server', () => ({
 }))
 
 vi.mock('@/lib/utils/comparison-order', () => ({
-  selectNextPair: vi.fn(() => ['3', '4']),
+  selectNextPair: vi.fn(),
 }))
 
 vi.mock('@/lib/utils/topological-sort', () => ({
@@ -73,7 +73,7 @@ function makeParams(resultCode: string) {
   return { params: Promise.resolve({ resultCode }) }
 }
 
-beforeEach(() => {
+beforeEach(async () => {
   vi.clearAllMocks()
   mockSessionSingle.mockResolvedValue({ data: mockSession, error: null })
   mockItemsResult.mockResolvedValue({ data: mockItems, error: null })
@@ -82,6 +82,11 @@ beforeEach(() => {
     error: null,
   })
   mockRpc.mockResolvedValue({ data: 3, error: null })
+
+  // 1st call(쌍 검증): 제출 쌍 ['1','2']와 일치 → 통과
+  // 2nd call(다음 쌍 결정): ['3','4'] 반환
+  const { selectNextPair } = await import('@/lib/utils/comparison-order')
+  vi.mocked(selectNextPair).mockReturnValueOnce(['1', '2']).mockReturnValueOnce(['3', '4'])
 })
 
 describe('POST /api/play-sessions/:resultCode/comparisons', () => {
@@ -163,9 +168,27 @@ describe('POST /api/play-sessions/:resultCode/comparisons', () => {
     expect(body.error.code).toBe('VALIDATION_ERROR')
   })
 
+  it('현재 예상 쌍과 다른 쌍을 제출하면 400 INVALID_PAIR를 반환한다', async () => {
+    const { selectNextPair } = await import('@/lib/utils/comparison-order')
+    vi.mocked(selectNextPair).mockReset()
+    // 검증용 1st call: ['3','4'] → 제출 쌍 ['1','2']와 불일치
+    vi.mocked(selectNextPair).mockReturnValueOnce(['3', '4'])
+
+    const res = await POST(
+      makeRequest('RESULT1', { winner_item_id: '1', loser_item_id: '2' }),
+      makeParams('RESULT1'),
+    )
+    const body = await res.json()
+
+    expect(res.status).toBe(400)
+    expect(body.error.code).toBe('INVALID_PAIR')
+  })
+
   it('selectNextPair가 null이면 is_complete: true, next_pair: null을 반환한다', async () => {
     const { selectNextPair } = await import('@/lib/utils/comparison-order')
-    vi.mocked(selectNextPair).mockReturnValueOnce(null)
+    vi.mocked(selectNextPair).mockReset()
+    // 검증용 1st call: ['1','2'] → 통과 / 다음 쌍 결정 2nd call: null → is_complete
+    vi.mocked(selectNextPair).mockReturnValueOnce(['1', '2']).mockReturnValueOnce(null)
 
     const res = await POST(
       makeRequest('RESULT1', { winner_item_id: '1', loser_item_id: '2' }),

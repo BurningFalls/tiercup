@@ -58,6 +58,13 @@ export async function POST(request: NextRequest) {
     display_order: number
   }>
 
+  if (items.length < 2) {
+    return NextResponse.json(
+      { error: { code: 'INSUFFICIENT_ITEMS', message: '플레이하려면 아이템이 2개 이상 필요합니다.' } },
+      { status: 400 },
+    )
+  }
+
   // result_code 중복 방지 재시도
   for (let attempt = 0; attempt < 3; attempt++) {
     const result_code = generateResultCode()

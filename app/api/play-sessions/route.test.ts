@@ -22,7 +22,7 @@ const mockSessionInsertSelect = vi.fn(() => ({ single: mockSessionSingle }))
 const mockSessionInsert = vi.fn(() => ({ select: mockSessionInsertSelect }))
 
 // rpc
-const mockRpc = vi.fn(() => Promise.resolve({ error: null }))
+const mockRpc = vi.fn()
 
 const mockFrom = vi.fn((table: string) => {
   if (table === 'tier_cups') return { select: mockTierCupSelect }
@@ -132,5 +132,41 @@ describe('POST /api/play-sessions', () => {
 
     expect(res.status).toBe(201)
     expect(body.first_pair).toBeNull()
+  })
+
+  it('아이템이 1개 이하면 400 INSUFFICIENT_ITEMS를 반환한다', async () => {
+    mockTierCupSingle.mockResolvedValue({
+      data: { ...mockTierCup, items: [mockItems[0]] },
+      error: null,
+    })
+
+    const res = await POST(makeRequest({ play_code: 'ABC123' }))
+    const body = await res.json()
+
+    expect(res.status).toBe(400)
+    expect(body.error.code).toBe('INSUFFICIENT_ITEMS')
+  })
+
+  it('아이템이 0개면 400 INSUFFICIENT_ITEMS를 반환한다', async () => {
+    mockTierCupSingle.mockResolvedValue({
+      data: { ...mockTierCup, items: [] },
+      error: null,
+    })
+
+    const res = await POST(makeRequest({ play_code: 'ABC123' }))
+    const body = await res.json()
+
+    expect(res.status).toBe(400)
+    expect(body.error.code).toBe('INSUFFICIENT_ITEMS')
+  })
+
+  it('increment_play_count RPC 실패 시에도 201을 반환한다', async () => {
+    mockRpc.mockResolvedValue({ error: { code: '99999', message: 'fail' } })
+
+    const res = await POST(makeRequest({ play_code: 'ABC123' }))
+    const body = await res.json()
+
+    expect(res.status).toBe(201)
+    expect(body.result_code).toBe('RESULT1')
   })
 })

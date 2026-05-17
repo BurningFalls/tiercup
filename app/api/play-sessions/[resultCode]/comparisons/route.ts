@@ -108,14 +108,27 @@ export async function POST(
     )
   }
 
+  // 현재 예상 비교 쌍 검증 — 임의 쌍 제출로 인한 사이클/오염 방지
+  const existingList = (existingComparisons ?? []).map((c) => ({
+    winner_item_id: String(c.winner_item_id),
+    loser_item_id: String(c.loser_item_id),
+  }))
+  const expectedPair = selectNextPair(itemIds, existingList)
+  if (
+    expectedPair === null ||
+    !(
+      (expectedPair[0] === winner_item_id && expectedPair[1] === loser_item_id) ||
+      (expectedPair[0] === loser_item_id && expectedPair[1] === winner_item_id)
+    )
+  ) {
+    return NextResponse.json(
+      { error: { code: 'INVALID_PAIR', message: '현재 비교 순서에 맞지 않는 쌍입니다.' } },
+      { status: 400 },
+    )
+  }
+
   // 방금 비교한 결과 포함해서 티어 계산
-  const comparisonList = [
-    ...(existingComparisons ?? []).map((c) => ({
-      winner_item_id: String(c.winner_item_id),
-      loser_item_id: String(c.loser_item_id),
-    })),
-    { winner_item_id, loser_item_id },
-  ]
+  const comparisonList = [...existingList, { winner_item_id, loser_item_id }]
 
   // 위상정렬로 현재 티어 계산
   const graph = buildDirectedGraph(itemIds, comparisonList)
