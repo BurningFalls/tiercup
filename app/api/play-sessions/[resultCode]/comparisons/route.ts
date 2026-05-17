@@ -156,17 +156,23 @@ export async function POST(
 
   // 다음 비교 쌍 결정
   const nextPairIds = selectNextPair(itemIds, comparisonList)
-  const newComparisonCount = session.comparison_count + 1
   const isComplete = nextPairIds === null
 
-  // 세션 comparison_count 업데이트, 완료 시 status/completed_at도 갱신
-  const sessionUpdate: Record<string, unknown> = { comparison_count: newComparisonCount }
-  if (isComplete) {
-    sessionUpdate.status = 'completed'
-    sessionUpdate.completed_at = new Date().toISOString()
+  // 세션 comparison_count atomic increment (race condition 방지)
+  // 완료 시 status/completed_at도 함께 갱신
+  const { error: sessionUpdateError } = await supabase.rpc('increment_comparison_count', {
+    p_session_id: session.id,
+    p_is_complete: isComplete,
+  })
+
+  if (sessionUpdateError) {
+    return NextResponse.json(
+      { error: { code: 'INTERNAL_ERROR', message: '세션 업데이트에 실패했습니다.' } },
+      { status: 500 },
+    )
   }
 
-  await supabase.from('play_sessions').update(sessionUpdate).eq('id', session.id)
+  const newComparisonCount = session.comparison_count + 1
 
   // current_tiers 조립 (S→A→B→C→D→F→? 순)
   const TIER_ORDER: Tier[] = ['S', 'A', 'B', 'C', 'D', 'F', '?']

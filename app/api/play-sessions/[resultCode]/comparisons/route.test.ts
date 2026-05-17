@@ -20,10 +20,6 @@ const mockSessionSingle = vi.fn()
 const mockSessionEq = vi.fn(() => ({ single: mockSessionSingle }))
 const mockSessionSelect = vi.fn(() => ({ eq: mockSessionEq }))
 
-// play_sessions: update → eq
-const mockSessionUpdateEq = vi.fn(() => Promise.resolve({ error: null }))
-const mockSessionUpdate = vi.fn(() => ({ eq: mockSessionUpdateEq }))
-
 // items: select → eq
 const mockItemsResult = vi.fn()
 const mockItemsEq = vi.fn(() => mockItemsResult())
@@ -41,9 +37,11 @@ const mockComparisonsSelect = vi.fn(() => ({ eq: mockComparisonsSelectEq }))
 // play_results upsert
 const mockUpsert = vi.fn(() => Promise.resolve({ error: null }))
 
+// rpc (increment_comparison_count)
+const mockRpc = vi.fn(() => Promise.resolve({ error: null }))
+
 const mockFrom = vi.fn((table: string) => {
-  if (table === 'play_sessions')
-    return { select: mockSessionSelect, update: mockSessionUpdate }
+  if (table === 'play_sessions') return { select: mockSessionSelect }
   if (table === 'items') return { select: mockItemsSelect }
   if (table === 'comparisons')
     return { insert: mockComparisonsInsert, select: mockComparisonsSelect }
@@ -51,7 +49,7 @@ const mockFrom = vi.fn((table: string) => {
   return {}
 })
 
-const mockClient = { from: mockFrom }
+const mockClient = { from: mockFrom, rpc: mockRpc }
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => Promise.resolve(mockClient)),
@@ -94,8 +92,7 @@ beforeEach(() => {
     error: null,
   })
   mockUpsert.mockResolvedValue({ error: null })
-  mockSessionUpdate.mockReturnValue({ eq: mockSessionUpdateEq })
-  mockSessionUpdateEq.mockResolvedValue({ error: null })
+  mockRpc.mockResolvedValue({ error: null })
 })
 
 describe('POST /api/play-sessions/:resultCode/comparisons', () => {
@@ -189,6 +186,20 @@ describe('POST /api/play-sessions/:resultCode/comparisons', () => {
 
   it('comparisons INSERT 실패 시 500을 반환한다', async () => {
     mockComparisonsInsert.mockResolvedValue({ error: { code: '99999', message: 'fail' } })
+
+    const res = await POST(
+      makeRequest('RESULT1', { winner_item_id: '1', loser_item_id: '2' }),
+      makeParams('RESULT1'),
+    )
+    const body = await res.json()
+
+    expect(res.status).toBe(500)
+    expect(body.error.code).toBe('INTERNAL_ERROR')
+  })
+
+  it('세션 업데이트(rpc) 실패 시 500을 반환한다', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockRpc.mockResolvedValue({ error: { code: '99999', message: 'fail' } as any })
 
     const res = await POST(
       makeRequest('RESULT1', { winner_item_id: '1', loser_item_id: '2' }),
