@@ -1,0 +1,211 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import { selectNextPair } from '@/lib/utils/comparison-order'
+import { buildDirectedGraph, calculateLevels, assignTiers } from '@/lib/utils/topological-sort'
+import { z } from 'zod'
+import type { Tier } from '@/lib/types'
+
+const comparisonSchema = z.object({
+  winner_item_id: z.string().min(1),
+  loser_item_id: z.string().min(1),
+})
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ resultCode: string }> },
+) {
+  const { resultCode } = await params
+
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json(
+      { error: { code: 'VALIDATION_ERROR', message: '요청 본문이 올바르지 않습니다.' } },
+      { status: 400 },
+    )
+  }
+
+  const parsed = comparisonSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: { code: 'VALIDATION_ERROR', message: parsed.error.issues[0].message } },
+      { status: 400 },
+    )
+  }
+
+  const { winner_item_id, loser_item_id } = parsed.data
+
+  if (winner_item_id === loser_item_id) {
+    return NextResponse.json(
+      { error: { code: 'VALIDATION_ERROR', message: '같은 아이템을 비교할 수 없습니다.' } },
+      { status: 400 },
+    )
+  }
+
+  const supabase = await createClient()
+
+  // 세션 조회
+  const { data: session, error: sessionError } = await supabase
+    .from('play_sessions')
+    .select('id, status, comparison_count, tier_cup_id')
+    .eq('result_code', resultCode)
+    .single()
+
+  if (sessionError) {
+    const isNotFound = sessionError.code === 'PGRST116'
+    return NextResponse.json(
+      {
+        error: {
+          code: isNotFound ? 'SESSION_NOT_FOUND' : 'INTERNAL_ERROR',
+          message: isNotFound ? '플레이 세션을 찾을 수 없습니다.' : '서버 오류가 발생했습니다.',
+        },
+      },
+      { status: isNotFound ? 404 : 500 },
+    )
+  }
+
+  if (session.status === 'completed') {
+    return NextResponse.json(
+      { error: { code: 'SESSION_ALREADY_COMPLETED', message: '이미 완료된 세션입니다.' } },
+      { status: 400 },
+    )
+  }
+
+  // 아이템 목록 조회
+  const { data: items, error: itemsError } = await supabase
+    .from('items')
+    .select('id, name, image_url')
+    .eq('tier_cup_id', session.tier_cup_id)
+
+  if (itemsError) {
+    return NextResponse.json(
+      { error: { code: 'INTERNAL_ERROR', message: '서버 오류가 발생했습니다.' } },
+      { status: 500 },
+    )
+  }
+
+  const itemIds = (items ?? []).map((i) => String(i.id))
+  const itemIdSet = new Set(itemIds)
+
+  if (!itemIdSet.has(winner_item_id) || !itemIdSet.has(loser_item_id)) {
+    return NextResponse.json(
+      { error: { code: 'VALIDATION_ERROR', message: '해당 세션에 속하지 않는 아이템입니다.' } },
+      { status: 400 },
+    )
+  }
+
+  // 비교 결과 저장
+  const { error: insertError } = await supabase
+    .from('comparisons')
+    .insert({ play_session_id: session.id, winner_item_id, loser_item_id })
+
+  if (insertError) {
+    return NextResponse.json(
+      { error: { code: 'INTERNAL_ERROR', message: '비교 결과 저장에 실패했습니다.' } },
+      { status: 500 },
+    )
+  }
+
+  // 전체 비교 목록 조회 (방금 INSERT한 것 포함)
+  const { data: allComparisons, error: comparisonsError } = await supabase
+    .from('comparisons')
+    .select('winner_item_id, loser_item_id')
+    .eq('play_session_id', session.id)
+
+  if (comparisonsError) {
+    return NextResponse.json(
+      { error: { code: 'INTERNAL_ERROR', message: '서버 오류가 발생했습니다.' } },
+      { status: 500 },
+    )
+  }
+
+  const comparisonList = (allComparisons ?? []).map((c) => ({
+    winner_item_id: String(c.winner_item_id),
+    loser_item_id: String(c.loser_item_id),
+  }))
+
+  // 위상정렬로 현재 티어 계산
+  const graph = buildDirectedGraph(itemIds, comparisonList)
+  const levels = calculateLevels(graph, itemIds)
+  const comparedItemIds = new Set<string>()
+  for (const [winner, losers] of graph) {
+    if (losers.size > 0) comparedItemIds.add(winner)
+    for (const loser of losers) comparedItemIds.add(loser)
+  }
+  const tierMap = assignTiers(levels, comparedItemIds)
+
+  // play_results upsert
+  const upsertRows = itemIds.map((id, idx) => ({
+    play_session_id: session.id,
+    item_id: id,
+    tier: (tierMap[id] ?? '?') as Tier,
+    tier_order: idx,
+  }))
+
+  const { error: upsertError } = await supabase
+    .from('play_results')
+    .upsert(upsertRows, { onConflict: 'play_session_id,item_id' })
+
+  if (upsertError) {
+    return NextResponse.json(
+      { error: { code: 'INTERNAL_ERROR', message: '결과 저장에 실패했습니다.' } },
+      { status: 500 },
+    )
+  }
+
+  // 다음 비교 쌍 결정
+  const nextPairIds = selectNextPair(itemIds, comparisonList)
+  const newComparisonCount = session.comparison_count + 1
+  const isComplete = nextPairIds === null
+
+  // 세션 comparison_count 업데이트, 완료 시 status/completed_at도 갱신
+  const sessionUpdate: Record<string, unknown> = { comparison_count: newComparisonCount }
+  if (isComplete) {
+    sessionUpdate.status = 'completed'
+    sessionUpdate.completed_at = new Date().toISOString()
+  }
+
+  await supabase.from('play_sessions').update(sessionUpdate).eq('id', session.id)
+
+  // current_tiers 조립 (S→A→B→C→D→F→? 순)
+  const TIER_ORDER: Tier[] = ['S', 'A', 'B', 'C', 'D', 'F', '?']
+  const itemMap = new Map((items ?? []).map((i) => [String(i.id), i]))
+
+  const tierGroups = new Map<Tier, Array<{ id: string; name: string; image_url: string | null }>>(
+    TIER_ORDER.map((t) => [t, []]),
+  )
+  for (const id of itemIds) {
+    const tier = (tierMap[id] ?? '?') as Tier
+    tierGroups.get(tier)!.push({
+      id,
+      name: itemMap.get(id)!.name,
+      image_url: itemMap.get(id)!.image_url,
+    })
+  }
+
+  const current_tiers = TIER_ORDER.filter((t) => tierGroups.get(t)!.length > 0).map((t) => ({
+    tier: t,
+    items: tierGroups.get(t)!,
+  }))
+
+  const toItemDto = (id: string) => ({
+    id,
+    name: itemMap.get(id)!.name,
+    image_url: itemMap.get(id)!.image_url,
+  })
+
+  const next_pair = nextPairIds
+    ? { item_a: toItemDto(nextPairIds[0]), item_b: toItemDto(nextPairIds[1]) }
+    : null
+
+  return NextResponse.json(
+    {
+      comparison_count: newComparisonCount,
+      current_tiers,
+      next_pair,
+      is_complete: isComplete,
+    },
+    { status: 201 },
+  )
+}
