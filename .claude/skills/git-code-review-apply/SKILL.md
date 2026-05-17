@@ -59,20 +59,41 @@ fetch한 코멘트를 분석합니다:
 
 모든 수정 완료 후 검증:
 ```bash
-npm run lint && npm run build
+npx tsc --noEmit && npm run lint && npm test && npm run build
 ```
 
 오류가 발생하면 해당 수정을 재검토 후 재시도합니다.
 
+검증 통과 후 자동으로 커밋하고 push합니다:
+
+```bash
+git add <수정된 파일들>
+git commit -m "fix: 코드 리뷰 반영 — <반영한 항목 한 줄 요약>
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
+git push
+```
+
+**push 완료 후 4단계를 진행합니다.**
+
 ## 4단계: GitHub reply 작성
+
+커밋 해시를 먼저 확인합니다:
+
+```bash
+COMMIT_SHA=$(git rev-parse HEAD)
+COMMIT_SHORT=$(git rev-parse --short HEAD)
+REPO=$(gh repo view --json owner,name --jq '"\(.owner.login)/\(.name)"')
+REPO_URL="https://github.com/$REPO"
+```
 
 **인라인 코멘트** — 반영 여부에 관계없이 모든 원본 코멘트에 reply를 작성합니다:
 
 ```bash
-# 반영한 경우
+# 반영한 경우 — 커밋 링크 포함
 gh api repos/$REPO/pulls/<PR번호>/comments/<코멘트id>/replies \
   -X POST \
-  -f body="반영했습니다. <구체적으로 무엇을 바꿨는지 한 줄>"
+  -f body="반영했습니다. <구체적으로 무엇을 바꿨는지 한 줄> ($REPO_URL/commit/$COMMIT_SHA)"
 
 # 반영하지 않은 경우 (이미 처리됨, 반영 불가 등)
 gh api repos/$REPO/pulls/<PR번호>/comments/<코멘트id>/replies \
@@ -85,7 +106,7 @@ gh api repos/$REPO/pulls/<PR번호>/comments/<코멘트id>/replies \
 ```bash
 gh api repos/$REPO/issues/<PR번호>/comments \
   -X POST \
-  -f body="## 반영 완료 (commit \`<커밋해시>\`)\n\n<반영한 항목 목록>\n\n<반영하지 않은 항목이 있으면 이유와 함께 명시>"
+  -f body="## 반영 완료 ($REPO_URL/commit/$COMMIT_SHA)\n\n<반영한 항목 목록>\n\n<반영하지 않은 항목이 있으면 이유와 함께 명시>"
 ```
 
 ## 5단계: 완료 보고
@@ -97,7 +118,6 @@ gh api repos/$REPO/issues/<PR번호>/comments \
 - 반영한 코멘트: N개
 - 건너뛴 코멘트: N개 (이유: 이미 처리됨 / 반영 불가)
 - 수정된 파일: [파일 목록]
-- lint/build: ✅ 통과
-
-다음 단계: /git-commit 으로 변경사항을 커밋하세요.
+- tsc/lint/test/build: ✅ 통과
+- 커밋: <커밋 링크>
 ```
