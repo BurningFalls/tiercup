@@ -1,0 +1,24 @@
+ONBOARDING.md
+  s_6c7da252c7bbc2::t_73cb33aedfcd28 1-77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9e0372c990e6cd5063c672be5e8db56992260f88",
+  "prompts": {},
+  "humans": {
+    "h_810e32449568f3": {
+      "author": "BurningFalls <sherlocky31415@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_6c7da252c7bbc2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7e20a1cb-a14b-4654-b23d-358fcf3219e0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "BurningFalls <sherlocky31415@gmail.com>"
+    }
+  }
+}
